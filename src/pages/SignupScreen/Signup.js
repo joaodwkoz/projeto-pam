@@ -1,4 +1,6 @@
 import { View, Pressable, Image, StyleSheet, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
+import { useState } from 'react';
+import axios from 'axios';
 import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -15,6 +17,55 @@ const Signup = () => {
     });
 
     const scale = PixelRatio.get();
+
+    const [nome, setNome] = useState();
+    const [email, setEmail] = useState();
+    const [senha, setSenha] = useState();
+    const [cep, setCep] = useState();
+    const [numero, setNumero] = useState();
+    const [complemento, setComplemento] = useState();
+    const [logradouro, setLogradouro] = useState();
+    const [bairro, setBairro] = useState();
+    const [cidade, setCidade] = useState();
+    const [estado, setEstado] = useState();
+
+    const pegarCep = () => {
+        axios.get(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(res => {
+            const data = res.data;
+            setLogradouro(data.logradouro);
+            setBairro(data.bairro);
+            setCidade(data.localidade);
+            setEstado(data.uf);
+            setComplemento(data.complemento);
+        })
+        .catch(e => {
+            console.error('Erro: ', e);
+        })
+    }
+
+    const cadastrar = async () => {
+        const usuario = new FormData();
+
+        usuario.append('nome', nome);
+        usuario.append('email', email);
+        usuario.append('senha', senha);
+        usuario.append('cep', cep);
+        usuario.append('numero', numero);
+        usuario.append('complemento', complemento);
+        usuario.append('logradouro', logradouro);
+        usuario.append('bairro', bairro);
+        usuario.append('cidade', cidade);
+        usuario.append('estado', estado);
+
+        const configuracao = {
+            headers: {
+                'Content-Type':'multipart/form-data'
+            }
+        }
+
+        axios.post('http://127.0.0.1:8000/api/usuario', usuario, configuracao);
+    }
 
     return (
         <View style={styles.container}>
@@ -38,7 +89,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} onChangeText={(nm) => setNome(nm)}></TextInput>
                     </View>
                 </View>
 
@@ -61,7 +112,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} onChangeText={(em) => setEmail(em)}></TextInput>
                     </View>
                 </View>
 
@@ -84,7 +135,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} onChangeText={(sn) => setSenha(sn)}></TextInput>
                     </View>
 
                     <View style={styles.inputExtra}>
@@ -112,7 +163,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
-                            }} scrollEnabled={false}></TextInput>
+                            }} scrollEnabled={false} multiline={false} onChangeText={(cep) => setCep(cep)} onSubmitEditing={() => pegarCep()}></TextInput>
                         </View>
                     </View>
 
@@ -135,7 +186,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
-                            }} scrollEnabled={false}></TextInput>
+                            }} scrollEnabled={false} multiline={false} onChangeText={(num) => setNumero(num)}></TextInput>
                         </View>
                     </View>
                 </View>
@@ -159,7 +210,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} editable={false} value={complemento}></TextInput>
                     </View>
                 </View>
 
@@ -182,7 +233,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} editable={false} value={logradouro}></TextInput>
                     </View>
                 </View>
 
@@ -205,7 +256,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} editable={false} value={bairro}></TextInput>
                     </View>
                 </View>
 
@@ -229,7 +280,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
-                            }} scrollEnabled={false}></TextInput>
+                            }} scrollEnabled={false} multiline={false} editable={false} value={cidade}></TextInput>
                         </View>
                     </View>
 
@@ -252,12 +303,12 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
-                            }} scrollEnabled={false}></TextInput>
+                            }} scrollEnabled={false} multiline={false} editable={false} value={estado}></TextInput>
                         </View>
                     </View>
                 </View>
 
-                <Pressable style={styles.signupBtn}>
+                <Pressable style={styles.signupBtn} onPress={() => cadastrar()}>
                     <Text style={{
                         fontFamily: 'Poppins-SB',
                         fontSize: 8 * scale,
