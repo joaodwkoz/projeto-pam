@@ -20,13 +20,36 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: '100%',
         flexDirection: 'row',
         gap: 0.0222 * width,
+        position: 'relative'
     },
 
     userImg: {
         height: '100%',
         aspectRatio: 1 / 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+    },
+
+    userImgOptions: {
+        position: 'absolute',
+        width: 0.3 * width,
+        height: 0.1 * height,
+        padding: 0.0222 * width,
+        borderRadius: 0.0222 * width,
+        top: '15%',
+        left: '7%',
+        backgroundColor: '#fefefe',
+        zIndex: 100,
+        gap: 0.0222 * width,
+    },
+
+    userImgOption: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fafafa',
+        borderRadius: 0.01 * width,
     },
 
     userInfo: {
@@ -67,5 +90,5 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: 0.0614 * height,
         backgroundColor: '#fff',
         borderRadius: 0.0333 * width
-    }
+    },
 });

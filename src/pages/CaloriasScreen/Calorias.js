@@ -24,7 +24,7 @@ const Calorias = () => {
                 </Pressable>
 
                 <Pressable style={styles.headerBtn}>
-                    <Ionicons name="settings-sharp" size={24} color="#97B9E5" />
+                    <Ionicons name="settings-sharp" size={0.0444 * width} color="#97B9E5" />
                 </Pressable>
             </View>
 

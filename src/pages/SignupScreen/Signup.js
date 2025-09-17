@@ -1,10 +1,10 @@
-import { View, Pressable, Image, StyleSheet, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
+import { View, Pressable, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
-
 import { dynamicStyles } from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Signup = () => {
     const { width, height } = useWindowDimensions();
@@ -45,6 +45,8 @@ const Signup = () => {
     }
 
     const cadastrar = async () => {
+        console.log('cadastrando!');
+
         const usuario = new FormData();
 
         usuario.append('nome', nome);
@@ -64,7 +66,14 @@ const Signup = () => {
             }
         }
 
-        axios.post('http://127.0.0.1:8000/api/usuario', usuario, configuracao);
+        axios.post('http://10.0.0.176:8000/api/usuario', usuario, configuracao)
+        .then(response => {
+            console.log(response.data);
+            AsyncStorage.setItem("usuario", String(response.data.usuario.id));
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
     }
 
     return (
