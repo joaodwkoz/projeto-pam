@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFonts } from 'expo-font';
 import axios from 'axios';
 import { dynamicStyles } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
     const { width, height } = useWindowDimensions();
@@ -23,12 +24,13 @@ const Home = () => {
     const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
     const [usuario, setUsuario] = useState({});
 
+    const data = new Date();
+
     const solicitarPermissoes = async () =>{
         const camera = await ImagePicker.requestCameraPermissionsAsync();
         const galeria = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if(camera.status !== 'granted' || galeria.status !== 'granted'){
-            Alert.alert('Permissão negada', 'É necessário permitir acesso à câmera e galeria.');
             return false; 
         }
 
@@ -39,7 +41,7 @@ const Home = () => {
         console.log(1);
 
         const permissoes = await solicitarPermissoes();
-        if(!permissoes) return;
+        if (!permissoes) return;
 
         const resultado = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -58,7 +60,7 @@ const Home = () => {
         console.log(2);
 
         const permissoes = await solicitarPermissoes();
-        if(!permissoes) return;
+        if (!permissoes) return;
 
         const resultado = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -69,23 +71,40 @@ const Home = () => {
             exif: true,
         });
           
-        if(!resultado.canceled){
+        if (!resultado.canceled) {
             setImagem(resultado.assets[0].uri);
         }
     }
 
     const carregarUsuario = async () => {
-        const id = await AsyncStorage.getItem('usuario');
+        try {
+            const id = await AsyncStorage.getItem('usuario');
 
-        axios.get(`http://10.0.0.176:8000/api/usuario/${Number(id)}`)
-        .then(res => {
-            setUsuario(res.data);
-            console.log(usuario);
-        })
-        .catch(e => {
-            console.error('Erro: ', e);
-        })
+            const response = await axios.get(`http://10.0.0.153:8000/api/usuario/${Number(id)}`);
+
+            const userData = response.data;
+
+            setUsuario(userData);
+
+            if (userData && userData.fotoPerfil) {
+                const urlImagem = `http://10.0.0.153:8000/storage/${userData.fotoPerfil}`;
+                setImagem(urlImagem);
+            } else {
+                console.log("Usuário não possui foto de perfil.");
+                setImagem(null); 
+            }
+        } catch (e) {
+            console.error('Erro ao carregar usuário:', e);
+        }
     }
+
+    const sair = async () => {
+        await AsyncStorage.removeItem("usuarioLogado");
+
+        navigation.navigate('Login');
+    }
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         carregarUsuario();
@@ -115,7 +134,7 @@ const Home = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#6A84AA'
-                        }}>9 de setembro de 2025</Text>
+                        }}>{data.getDate()} de {['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][data.getMonth()]} de 2025</Text>
                     </View>
                 </View>
 
@@ -126,20 +145,20 @@ const Home = () => {
 
             {mostrarOpcoes && (
                 <View style={styles.userImgOptions}>
-                    <Pressable style={styles.userImgOption} onPress={() => escolherDaGaleria()}>
+                    <Pressable style={styles.userImgOption} onPress={() => navigation.navigate('Profile')}>
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#dadada'
-                        }}>Escolher foto</Text>
+                        }}>Editar perfil</Text>
                     </Pressable>
 
-                    <Pressable style={styles.userImgOption} onPress={() => tirarFoto()}>
+                    <Pressable style={styles.userImgOption} onPress={() => sair()}>
                     <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#dadada'
-                        }}>Tirar foto</Text>
+                        }}>Sair</Text>
                     </Pressable>
                 </View>
             )}
