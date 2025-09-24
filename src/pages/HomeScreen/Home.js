@@ -86,7 +86,6 @@ const Home = () => {
             console.error('Erro: ', e);
         })
     }
-    // pegar id que esta no objeto asyncstorage da chave usuario e fazer um select na rota get
 
     useEffect(() => {
         carregarUsuario();
