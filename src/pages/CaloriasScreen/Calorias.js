@@ -1,13 +1,19 @@
 import { View, Pressable, Image, StyleSheet, Text, PixelRatio, useWindowDimensions } from 'react-native';
+import { useState, useRef } from 'react-native';
 import { useFonts } from 'expo-font';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { dynamicStyles } from './styles';
+import BottomSheetSlider from '../../../components/BottomSheetSlider';
 
 const Calorias = () => {
     const { width, height } = useWindowDimensions();
     
     const styles = dynamicStyles(width, height);
+
+    const bottomRef = useRef(null);
+    const snapPoints = useMemo(() => ['35%'], []);
+    const openPress = () => bottomRef.current?.expand();
 
     const [fontsLoaded] = useFonts({
         'Poppins-M': require('../../../assets/fonts/Poppins-Medium.ttf'),
@@ -264,6 +270,8 @@ const Calorias = () => {
                     }}>+</Text>
                 </Pressable>
             </View>
+
+            <BottomSheetSlider ref={bottomSheetRef} snapPoints={snapPoints} />
         </View>
     )
 }
