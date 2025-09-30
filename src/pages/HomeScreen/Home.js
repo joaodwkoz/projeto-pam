@@ -1,10 +1,9 @@
 
 import { View, Pressable, Image, Alert, Text, PixelRatio, useWindowDimensions } from 'react-native';
-import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import axios from 'axios';
 import { dynamicStyles } from './styles';
 
 const Home = () => {
@@ -19,84 +18,21 @@ const Home = () => {
 
     const scale = PixelRatio.get();
 
-    const [imagem, setImagem] = useState(null);
     const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-    const [usuario, setUsuario] = useState({});
+    const { usuario, signOut } = useContext(AuthContext);
 
-    const solicitarPermissoes = async () =>{
-        const camera = await ImagePicker.requestCameraPermissionsAsync();
-        const galeria = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const navigation = useNavigation();
 
-        if(camera.status !== 'granted' || galeria.status !== 'granted'){
-            Alert.alert('Permissão negada', 'É necessário permitir acesso à câmera e galeria.');
-            return false; 
-        }
-
-        return true;
-    }
-
-    const tirarFoto = async () => {
-        console.log(1);
-
-        const permissoes = await solicitarPermissoes();
-        if(!permissoes) return;
-
-        const resultado = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1,
-            cameraType: ImagePicker.CameraType.front,
-            aspect: [1, 1],
-        });
-
-        if(!resultado.canceled){
-            setImagem(resultado.assets[0].uri);
-        }
-    }
-
-    const escolherDaGaleria = async () => {
-        console.log(2);
-
-        const permissoes = await solicitarPermissoes();
-        if(!permissoes) return;
-
-        const resultado = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1,
-            aspect: [1, 1],
-            base64: true,
-            exif: true,
-        });
-          
-        if(!resultado.canceled){
-            setImagem(resultado.assets[0].uri);
-        }
-    }
-
-    const carregarUsuario = async () => {
-        const id = await AsyncStorage.getItem('usuario');
-
-        axios.get(`http://10.0.0.176:8000/api/usuario/${Number(id)}`)
-        .then(res => {
-            setUsuario(res.data);
-            console.log(usuario);
-        })
-        .catch(e => {
-            console.error('Erro: ', e);
-        })
-    }
-
-    useEffect(() => {
-        carregarUsuario();
-    }, []);
+    const imagemPerfilUrl = usuario?.fotoPerfil 
+        ? `http://192.168.0.5:8000/storage/${usuario.fotoPerfil}` 
+        : null;
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.user}>
                     <Pressable style={styles.userImg} onPress={() => setMostrarOpcoes(!mostrarOpcoes)}>
-                        <Image source={imagem ? { uri: imagem } : require('../../../assets/imgs/user-icon.png')} style={{
+                        <Image source={imagemPerfilUrl ? { uri: imagemPerfilUrl } : require('../../../assets/imgs/user-icon.png')} style={{
                             height: '100%',
                             aspectRatio: 1 / 1,
                             objectFit: 'contain',
@@ -109,7 +45,7 @@ const Home = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 8 * scale,
                             color: '#475C7C'
-                        }}>Olá, {usuario.nome}</Text>
+                        }}>Olá, {usuario?.name}</Text>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
@@ -126,20 +62,20 @@ const Home = () => {
 
             {mostrarOpcoes && (
                 <View style={styles.userImgOptions}>
-                    <Pressable style={styles.userImgOption} onPress={() => escolherDaGaleria()}>
+                    <Pressable style={styles.userImgOption} onPress={() => navigation.navigate('Profile')}>
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#dadada'
-                        }}>Escolher foto</Text>
+                        }}>Editar perfil</Text>
                     </Pressable>
 
-                    <Pressable style={styles.userImgOption} onPress={() => tirarFoto()}>
+                    <Pressable style={styles.userImgOption} onPress={signOut}>
                     <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#dadada'
-                        }}>Tirar foto</Text>
+                        }}>Sair</Text>
                     </Pressable>
                 </View>
             )}

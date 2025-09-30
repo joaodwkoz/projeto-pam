@@ -1,5 +1,9 @@
+import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator } from 'react-native';
+
+import { AuthContext, AuthProvider } from './contexts/AuthContext';
 
 import Home from './src/pages/HomeScreen/Home';
 import Login from './src/pages/LoginScreen/Login';
@@ -9,14 +13,39 @@ import Profile from './src/pages/ProfileScreen/Profile'
 
 const Stack = createNativeStackNavigator();
 
-export default function App(){
+const AppNavigation = () => {
+  const { signed, isLoading } = useContext(AuthContext);
+
+  if(isLoading){    
+    return <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{
         headerShown: false
       }}>
-        <Stack.Screen name="Profile" component={Profile} />
+        {signed ? (
+          <>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Calorias" component={Calorias} />
+            <Stack.Screen name="Profile" component={Profile} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Signup" component={Signup} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
+  )
+}
+
+export default function App(){
+  return (
+    <AuthProvider>
+      <AppNavigation />
+    </AuthProvider>
   )
 }

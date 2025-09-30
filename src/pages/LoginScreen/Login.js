@@ -1,8 +1,10 @@
-import { View, Pressable, Image, StyleSheet, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
+import { View, Pressable, Image, Alert, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
+import { useState, useContext } from 'react';
 import { useFonts } from 'expo-font';
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-
 import { dynamicStyles } from './styles';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 const Login = () => {
     const { width, height } = useWindowDimensions();
@@ -15,6 +17,26 @@ const Login = () => {
     });
 
     const scale = PixelRatio.get();
+
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+
+    const navigation = useNavigation();
+
+    const { signIn } = useContext(AuthContext);
+
+    const handleLogin = async () => {
+        if(!email || !senha){
+            Alert.alert('Erro de Login', 'Por favor, insira as infos necessárias.');
+            return;
+        }
+
+        try {
+            await signIn(email, senha);
+        } catch(e) {
+            Alert.alert('Erro de Login', e.message);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -54,7 +76,7 @@ const Login = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false} multiline={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} onChangeText={(em) => setEmail(em)} value={email}></TextInput>
                     </View>
                 </View>
 
@@ -77,7 +99,7 @@ const Login = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
-                        }} scrollEnabled={false}></TextInput>
+                        }} scrollEnabled={false} multiline={false} onChangeText={(sn) => setSenha(sn)} value={senha}></TextInput>
                     </View>
 
                     <View style={styles.inputExtra}>
@@ -85,7 +107,7 @@ const Login = () => {
                     </View>
                 </View>
 
-                <Pressable style={styles.loginBtn}>
+                <Pressable style={styles.loginBtn} onPress={handleLogin}>
                     <Text style={{
                         fontFamily: 'Poppins-SB',
                         fontSize: 8 * scale,
@@ -96,7 +118,7 @@ const Login = () => {
                 </Pressable>
 
                 <View style={styles.accountOptions}>
-                    <Pressable>
+                    <Pressable onPress={() => navigation.navigate('Signup')}>
                         <Text style={{
                             fontFamily: 'Poppins-SB',
                             fontSize: 6 * scale,

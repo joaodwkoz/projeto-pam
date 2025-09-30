@@ -1,10 +1,11 @@
-import { View, Pressable, Text, PixelRatio, useWindowDimensions, TextInput } from 'react-native';
-import { useState } from 'react';
+import { View, Pressable, Text, PixelRatio, useWindowDimensions, TextInput, Alert } from 'react-native';
+import { useState, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
 import { dynamicStyles } from './styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 const Signup = () => {
     const { width, height } = useWindowDimensions();
@@ -44,36 +45,21 @@ const Signup = () => {
         })
     }
 
-    const cadastrar = async () => {
-        console.log('cadastrando!');
+    const navigation = useNavigation();
 
-        const usuario = new FormData();
-
-        usuario.append('nome', nome);
-        usuario.append('email', email);
-        usuario.append('senha', senha);
-        usuario.append('cep', cep);
-        usuario.append('numero', numero);
-        usuario.append('complemento', complemento);
-        usuario.append('logradouro', logradouro);
-        usuario.append('bairro', bairro);
-        usuario.append('cidade', cidade);
-        usuario.append('estado', estado);
-
-        const configuracao = {
-            headers: {
-                'Content-Type':'multipart/form-data'
-            }
+    const { signUp } = useContext(AuthContext);
+    
+    const handleSignup = async () => {
+        if(!email || !senha || !nome || !cep || !numero || !logradouro || !bairro || !cidade || !estado){
+            Alert.alert('Erro de Login', 'Insira todas as infos necessárias.');
+            return;
         }
 
-        axios.post('http://10.0.0.176:8000/api/usuario', usuario, configuracao)
-        .then(response => {
-            console.log(response.data);
-            AsyncStorage.setItem("usuario", String(response.data.usuario.id));
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-        });
+        try {
+            await signUp(nome, email, senha, cep, numero, complemento, logradouro, bairro, cidade, estado);
+        } catch(e) {
+            Alert.alert('Erro de Login', e.message);
+        }
     }
 
     return (
@@ -317,7 +303,7 @@ const Signup = () => {
                     </View>
                 </View>
 
-                <Pressable style={styles.signupBtn} onPress={() => cadastrar()}>
+                <Pressable style={styles.signupBtn} onPress={handleSignup}>
                     <Text style={{
                         fontFamily: 'Poppins-SB',
                         fontSize: 8 * scale,
@@ -328,7 +314,7 @@ const Signup = () => {
                 </Pressable>
 
                 <View style={styles.accountOptions}>
-                    <Pressable>
+                    <Pressable onPress={() => navigation.navigate('Login')}>
                         <Text style={{
                             fontFamily: 'Poppins-SB',
                             fontSize: 6 * scale,

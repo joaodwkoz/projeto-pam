@@ -89,4 +89,26 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    userImgOptions: {
+        position: 'absolute',
+        width: 0.3 * width,
+        height: 0.1 * height,
+        padding: 0.0222 * width,
+        borderRadius: 0.0222 * width,
+        top: '22%',
+        left: '43%',
+        backgroundColor: '#fefefe',
+        zIndex: 100,
+        gap: 0.0222 * width,
+    },
+
+    userImgOption: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fafafa',
+        borderRadius: 0.01 * width,
+    },
 });
