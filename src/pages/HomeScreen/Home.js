@@ -5,6 +5,7 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { dynamicStyles } from './styles';
+import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
     const { width, height } = useWindowDimensions();
@@ -51,7 +52,7 @@ const Home = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#6A84AA'
-                        }}>9 de setembro de 2025</Text>
+                        }}>{data.getDate()} de {['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][data.getMonth()]} de 2025</Text>
                     </View>
                 </View>
 
@@ -71,7 +72,7 @@ const Home = () => {
                     </Pressable>
 
                     <Pressable style={styles.userImgOption} onPress={signOut}>
-                    <Text style={{
+                        <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#dadada'

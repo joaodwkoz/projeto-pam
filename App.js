@@ -22,8 +22,8 @@ const AppNavigation = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{
-        headerShown: false
+      <Stack.Navigator initialRouteName='Login' screenOptions={{
+        headerShown: false,
       }}>
         {signed ? (
           <>

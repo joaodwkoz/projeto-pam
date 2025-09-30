@@ -1,6 +1,9 @@
 import { View, Image, Text, TextInput, Pressable, useWindowDimensions, PixelRatio, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import { useFonts } from 'expo-font';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import * as ImagePicker from 'expo-image-picker';
 import { dynamicStyles } from './styles';
