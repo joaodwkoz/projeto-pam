@@ -79,6 +79,8 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: 0.1637 * height,
         backgroundColor: '#fff',
         borderRadius: 0.0444 * width,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     otherApps: {

@@ -1,4 +1,4 @@
-import { View, Pressable, Image, TextInput, Text, PixelRatio, useWindowDimensions, Modal, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Pressable, Image, TextInput, Text, PixelRatio, useWindowDimensions, Modal, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useFonts } from 'expo-font';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -26,7 +26,7 @@ const Calorias = () => {
     const [refeicoes, setRefeicoes] = useState({
         'cafe_manha': [],
         'almoco': [],
-        'janta': [],
+        'jantar': [],
         'lanche': [],
     });
 
@@ -46,7 +46,7 @@ const Calorias = () => {
 
         try {
             const response = await api.get(`/refeicoes/${today}`);
-            const initialMeals = { 'cafe_manha': [], 'almoco': [], 'janta': [], 'lanche': [] };
+            const initialMeals = { 'cafe_manha': [], 'almoco': [], 'jantar': [], 'lanche': [] };
             setRefeicoes({...initialMeals, ...response.data});
             console.log(response.data);
         } catch (error) {
@@ -132,7 +132,7 @@ const Calorias = () => {
         const tipo = {
             'Café da Manhã': 'cafe_manha',
             'Almoço': 'almoco',
-            'Janta': 'janta',
+            'Janta': 'jantar',
             'Lanches': 'lanche'
         }
 
@@ -212,265 +212,275 @@ const Calorias = () => {
                 </View>
             </View>
 
-            <View style={styles.meal}>
-                <View style={styles.mealHeader}>
-                    <View style={styles.mealIdentity}>
-                        <Image source={require('../../../assets/imgs/breakfast.png')} style={{
-                            width: 0.1 * width,
-                            aspectRatio: 1 / 1,
-                            objectFit: 'contain',
-                        }}/>
+            <ScrollView style={{
+                height: '100%'
+            }} contentContainerStyle={{
+                gap: 0.0444 * width,
+            }} showsVerticalScrollIndicator={false}>
+                <View style={styles.meal}>
+                    <View style={styles.mealHeader}>
+                        <View style={styles.mealIdentity}>
+                            <Image source={require('../../../assets/imgs/breakfast.png')} style={{
+                                width: 0.1 * width,
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                            }}/>
+
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 7 * scale,
+                                color: '#607DA3',
+                            }}>Café da Manhã</Text>
+                        </View>
+
+                        <View style={styles.calCounter}>
+                            <View style={styles.counter}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 6 * scale,
+                                    color: '#fff'
+                                }}>{calculateMealCalories('cafe_manha').toFixed(0)}</Text>
+                            </View>
+
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 6 * scale,
+                                color: '#607DA3'
+                            }}>calorias</Text>
+                        </View>
+                    </View>
+
+                    {refeicoes['cafe_manha'].map((food, index) => (
+                        <View key={food.id} style={styles.listFoodItem}>
+                            <View style={styles.listStyle}></View>
+
+                            <View style={styles.foodItem}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    color: '#607DA3',
+                                    paddingVertical: 0.002 * height,
+                                }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
+                                </Text>
+                            </View>
+                        </View>
+                    ))}
+
+                    <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Café da Manhã')}>
+                        <View style={styles.listStyle}></View>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 7 * scale,
-                            color: '#607DA3',
-                        }}>Café da Manhã</Text>
-                    </View>
-
-                    <View style={styles.calCounter}>
-                        <View style={styles.counter}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 6 * scale,
-                                color: '#fff'
-                            }}>{calculateMealCalories('cafe_manha').toFixed(0)}</Text>
-                        </View>
+                            color: '#607DA3'
+                        }}>Adicionar alimento(s)</Text>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
-                            fontSize: 6 * scale,
+                            fontSize: 10 * scale,
                             color: '#607DA3'
-                        }}>calorias</Text>
-                    </View>
+                        }}>+</Text>
+                    </Pressable>
                 </View>
 
-                {refeicoes['cafe_manha'].map((food, index) => (
-                    <View key={food.id} style={styles.listItem}>
-                        <View style={styles.listStyle}></View>
+                <View style={styles.meal}>
+                    <View style={styles.mealHeader}>
+                        <View style={styles.mealIdentity}>
+                            <Image source={require('../../../assets/imgs/lunch.png')} style={{
+                                width: 0.1 * width,
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                            }}/>
 
-                        <View style={styles.foodItem}>
                             <Text style={{
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
+                                color: '#607DA3',
+                            }}>Almoço</Text>
+                        </View>
+
+                        <View style={styles.calCounter}>
+                            <View style={styles.counter}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 6 * scale,
+                                    color: '#fff'
+                                }}>{calculateMealCalories('almoco').toFixed(0)}</Text>
+                            </View>
+
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 6 * scale,
                                 color: '#607DA3'
-                            }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
-                            </Text>
+                            }}>calorias</Text>
                         </View>
                     </View>
-                ))}
 
-                <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Café da Manhã')}>
-                    <View style={styles.listStyle}></View>
+                    {refeicoes['almoco'].map((food, index) => (
+                        <View key={food.id} style={styles.listFoodItem}>
+                            <View style={styles.listStyle}></View>
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 7 * scale,
-                        color: '#607DA3'
-                    }}>Adicionar alimento(s)</Text>
+                            <View style={styles.foodItem}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    color: '#607DA3',
+                                    paddingVertical: 0.002 * height,
+                                }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
+                                </Text>
+                            </View>
+                        </View>
+                    ))}
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 10 * scale,
-                        color: '#607DA3'
-                    }}>+</Text>
-                </Pressable>
-            </View>
-
-            <View style={styles.meal}>
-                <View style={styles.mealHeader}>
-                    <View style={styles.mealIdentity}>
-                        <Image source={require('../../../assets/imgs/lunch.png')} style={{
-                            width: 0.1 * width,
-                            aspectRatio: 1 / 1,
-                            objectFit: 'contain',
-                        }}/>
+                    <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Almoço')}>
+                        <View style={styles.listStyle}></View>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 7 * scale,
-                            color: '#607DA3',
-                        }}>Almoço</Text>
-                    </View>
-
-                    <View style={styles.calCounter}>
-                        <View style={styles.counter}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 6 * scale,
-                                color: '#fff'
-                            }}>{calculateMealCalories('almoco').toFixed(0)}</Text>
-                        </View>
+                            color: '#607DA3'
+                        }}>Adicionar alimento(s)</Text>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
-                            fontSize: 6 * scale,
+                            fontSize: 10 * scale,
                             color: '#607DA3'
-                        }}>calorias</Text>
-                    </View>
+                        }}>+</Text>
+                    </Pressable>
                 </View>
 
-                {refeicoes['almoco'].map((food, index) => (
-                    <View key={food.id} style={styles.listItem}>
-                        <View style={styles.listStyle}></View>
+                <View style={styles.meal}>
+                    <View style={styles.mealHeader}>
+                        <View style={styles.mealIdentity}>
+                            <Image source={require('../../../assets/imgs/dinner.png')} style={{
+                                width: 0.1 * width,
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                            }}/>
 
-                        <View style={styles.foodItem}>
                             <Text style={{
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
+                                color: '#607DA3',
+                            }}>Jantar</Text>
+                        </View>
+
+                        <View style={styles.calCounter}>
+                            <View style={styles.counter}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 6 * scale,
+                                    color: '#fff'
+                                }}>{calculateMealCalories('jantar').toFixed(0)}</Text>
+                            </View>
+
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 6 * scale,
                                 color: '#607DA3'
-                            }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
-                            </Text>
+                            }}>calorias</Text>
                         </View>
                     </View>
-                ))}
 
-                <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Almoço')}>
-                    <View style={styles.listStyle}></View>
+                    {refeicoes['jantar'].map((food, index) => (
+                        <View key={food.id} style={styles.listFoodItem}>
+                            <View style={styles.listStyle}></View>
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 7 * scale,
-                        color: '#607DA3'
-                    }}>Adicionar alimento(s)</Text>
+                            <View style={styles.foodItem}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    color: '#607DA3',
+                                    paddingVertical: 0.002 * height,
+                                }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
+                                </Text>
+                            </View>
+                        </View>
+                    ))}
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 10 * scale,
-                        color: '#607DA3'
-                    }}>+</Text>
-                </Pressable>
-            </View>
-
-            <View style={styles.meal}>
-                <View style={styles.mealHeader}>
-                    <View style={styles.mealIdentity}>
-                        <Image source={require('../../../assets/imgs/dinner.png')} style={{
-                            width: 0.1 * width,
-                            aspectRatio: 1 / 1,
-                            objectFit: 'contain',
-                        }}/>
+                    <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Janta')}>
+                        <View style={styles.listStyle}></View>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 7 * scale,
-                            color: '#607DA3',
-                        }}>Janta</Text>
-                    </View>
-
-                    <View style={styles.calCounter}>
-                        <View style={styles.counter}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 6 * scale,
-                                color: '#fff'
-                            }}>{calculateMealCalories('janta').toFixed(0)}</Text>
-                        </View>
+                            color: '#607DA3'
+                        }}>Adicionar alimento(s)</Text>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
-                            fontSize: 6 * scale,
+                            fontSize: 10 * scale,
                             color: '#607DA3'
-                        }}>calorias</Text>
-                    </View>
+                        }}>+</Text>
+                    </Pressable>
                 </View>
 
-                {refeicoes['janta'].map((food, index) => (
-                    <View key={food.id} style={styles.listItem}>
-                        <View style={styles.listStyle}></View>
+                <View style={styles.meal}>
+                    <View style={styles.mealHeader}>
+                        <View style={styles.mealIdentity}>
+                            <Image source={require('../../../assets/imgs/snacks.png')} style={{
+                                width: 0.1 * width,
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                            }}/>
 
-                        <View style={styles.foodItem}>
                             <Text style={{
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
+                                color: '#607DA3',
+                            }}>Lanches</Text>
+                        </View>
+
+                        <View style={styles.calCounter}>
+                            <View style={styles.counter}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 6 * scale,
+                                    color: '#fff'
+                                }}>{calculateMealCalories('lanche').toFixed(0)}</Text>
+                            </View>
+
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 6 * scale,
                                 color: '#607DA3'
-                            }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
-                            </Text>
+                            }}>calorias</Text>
                         </View>
                     </View>
-                ))}
 
-                <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Janta')}>
-                    <View style={styles.listStyle}></View>
+                    {refeicoes['lanche'].map((food, index) => (
+                        <View key={food.id} style={styles.listFoodItem}>
+                            <View style={styles.listStyle}></View>
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 7 * scale,
-                        color: '#607DA3'
-                    }}>Adicionar alimento(s)</Text>
+                            <View style={styles.foodItem}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    color: '#607DA3',
+                                    paddingVertical: 0.002 * height,
+                                }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
+                                </Text>
+                            </View>
+                        </View>
+                    ))}
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 10 * scale,
-                        color: '#607DA3'
-                    }}>+</Text>
-                </Pressable>
-            </View>
-
-            <View style={styles.meal}>
-                <View style={styles.mealHeader}>
-                    <View style={styles.mealIdentity}>
-                        <Image source={require('../../../assets/imgs/snacks.png')} style={{
-                            width: 0.1 * width,
-                            aspectRatio: 1 / 1,
-                            objectFit: 'contain',
-                        }}/>
+                    <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Lanches')}>
+                        <View style={styles.listStyle}></View>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
                             fontSize: 7 * scale,
-                            color: '#607DA3',
-                        }}>Lanches</Text>
-                    </View>
-
-                    <View style={styles.calCounter}>
-                        <View style={styles.counter}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 6 * scale,
-                                color: '#fff'
-                            }}>{calculateMealCalories('lanche').toFixed(0)}</Text>
-                        </View>
+                            color: '#607DA3'
+                        }}>Adicionar alimento(s)</Text>
 
                         <Text style={{
                             fontFamily: 'Poppins-M',
-                            fontSize: 6 * scale,
+                            fontSize: 10 * scale,
                             color: '#607DA3'
-                        }}>calorias</Text>
-                    </View>
+                        }}>+</Text>
+                    </Pressable>
                 </View>
-
-                {refeicoes['lanche'].map((food, index) => (
-                    <View key={food.id} style={styles.listItem}>
-                        <View style={styles.listStyle}></View>
-
-                        <View style={styles.foodItem}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#607DA3'
-                            }}>{food.quantidade}x {food.nome_alimento} ({food.total_calorias.toFixed(0)} kcal)
-                            </Text>
-                        </View>
-                    </View>
-                ))}
-
-                <Pressable style={styles.addFoodBtn} onPress={() => openSearchModal('Lanches')}>
-                    <View style={styles.listStyle}></View>
-
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 7 * scale,
-                        color: '#607DA3'
-                    }}>Adicionar alimento(s)</Text>
-
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 10 * scale,
-                        color: '#607DA3'
-                    }}>+</Text>
-                </Pressable>
-            </View>
+            </ScrollView>
 
             <Modal visible={modalVisible} animationType='slide' transparent>
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -501,8 +511,8 @@ const Calorias = () => {
                                     !selectedFood && searchResults.length > 0 && (
                                         <ScrollView style={styles.options} keyboardShouldPersistTaps="handled">
                                             {searchResults.map((item) => (
-                                                <View key={item.id}>
-                                                    <Pressable onPress={() => handleSelectFood(item)}>
+                                                <View key={item.id} style={styles.option}>
+                                                    <Pressable onPress={() => handleSelectFood(item)} style={styles.optionPressable}>
                                                         <Text style={{
                                                             fontFamily: 'Poppins-M',
                                                             fontSize: 6 * scale,
@@ -541,7 +551,7 @@ const Calorias = () => {
                                         backgroundColor: '#fff',
                                         color: '#5E779A',
                                         borderRadius: 0.015 * width,
-                                    }} value={portionCount}></TextInput>
+                                    }} value={portionCount.toString()} onChangeText={(text) => setPortionCount(NUmber(portionCount))}></TextInput>
 
                                     <Pressable style={styles.portionCounterBtn} onPress={() => handlePortionChange(+1)}>
                                         <Entypo name="plus" size={24} color="#fff" />
