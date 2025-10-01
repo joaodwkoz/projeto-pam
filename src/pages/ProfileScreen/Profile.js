@@ -5,11 +5,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import * as ImagePicker from 'expo-image-picker';
 import { dynamicStyles } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import api from '../../../services/api';
-import axios from 'axios';
 import { AuthContext } from '../../../contexts/AuthContext';
 
 const Profile = () => {
@@ -73,7 +71,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchUsuario = async () => {
             try {
-                const res = await api.get('/user');
+                const res = await api.get('/usuario');
                 setDadosUsuario(res.data);
             } catch(e) {
                 console.error("Erro ao buscar dados do usuário:", e);

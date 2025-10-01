@@ -5,7 +5,6 @@ import { AuthContext } from '../../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { dynamicStyles } from './styles';
-import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
     const { width, height } = useWindowDimensions();
@@ -23,6 +22,8 @@ const Home = () => {
     const { usuario, signOut } = useContext(AuthContext);
 
     const navigation = useNavigation();
+
+    const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
         ? `http://192.168.0.5:8000/storage/${usuario.fotoPerfil}` 
@@ -99,9 +100,9 @@ const Home = () => {
                 </View>
 
                 <View style={styles.appsContainer}>
-                    <View style={styles.mainApp}>
+                    <Pressable style={styles.mainApp} onPress={() => navigation.navigate('Calorias')}>
 
-                    </View>
+                    </Pressable>
 
                     <View style={styles.otherApps}>
                         <View style={styles.app}></View>
