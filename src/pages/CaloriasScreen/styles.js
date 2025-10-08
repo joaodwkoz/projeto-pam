@@ -97,6 +97,13 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * width,
     },
 
+    listFoodItem: {
+        paddingVertical: 0.002 * height,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 0.0222 * width,
+    },
+
     listStyle: {
         height: '100%',
         width: 0.00833333 * width,
@@ -124,7 +131,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     
     options: {
         width: 0.75 * width - 0.0444 * width * 2,
-        height: 0.1525 * height,
+        height: 0.235 * height,
         position: 'absolute',
         left: 0 * width,
         top: 0.115 * height,
@@ -136,7 +143,12 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
 
     option: {
         width: '100%',
-        height: ((0.1525 * height - 0.0222 * width * 2) - 3 * 0.002 * height) / 4,
+        paddingTop: 0.01 * height,
+        gap: 0.01 * height,
+    },
+
+    optionPressable: {
+        height: 'auto',
         justifyContent: 'center',
     },
 

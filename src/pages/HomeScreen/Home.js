@@ -26,7 +26,7 @@ const Home = () => {
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `http://192.168.0.5:8000/storage/${usuario.fotoPerfil}` 
+        ? `http://10.67.5.27:8000/storage/${usuario.fotoPerfil}` 
         : null;
 
     return (
@@ -47,9 +47,10 @@ const Home = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 8 * scale,
                             color: '#475C7C'
-                        }}>Olá, {usuario?.name}</Text>
+                        }}>Olá, {usuario?.name}!</Text>
 
                         <Text style={{
+                            width: '100%',
                             fontFamily: 'Poppins-M',
                             fontSize: 5 * scale,
                             color: '#6A84AA'
@@ -85,12 +86,18 @@ const Home = () => {
             <View style={styles.apps}>
                 <View style={styles.appsHeader}>
                     <Text style={{
+                        width: '60%',
                         fontFamily: 'Poppins-M',
                         fontSize: 13 * scale,
-                        color: '#6C83A1'
+                        color: '#6C83A1',
+                        flexShrink: 1,
                     }}>Aplicações</Text>
 
-                    <Pressable>
+                    <Pressable style={{
+                        width: '40%',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
                         <Text style={{
                             fontFamily: 'Poppins-SB',
                             fontSize: 7 * scale,
@@ -101,7 +108,11 @@ const Home = () => {
 
                 <View style={styles.appsContainer}>
                     <Pressable style={styles.mainApp} onPress={() => navigation.navigate('Calorias')}>
-
+                        <Image source={require('../../../assets/imgs/calorias.png')} style={{
+                            height: '50%',
+                            aspectRatio: 1 / 1,
+                            objectFit: 'contain'
+                        }}></Image>
                     </Pressable>
 
                     <View style={styles.otherApps}>
@@ -117,7 +128,8 @@ const Home = () => {
                     <Text style={{
                         fontFamily: 'Poppins-M',
                         fontSize: 13 * scale,
-                        color: '#6C83A1'
+                        color: '#6C83A1',
+                        flexShrink: 1,
                     }}>Metas do dia</Text>
                 </View>
             </View>

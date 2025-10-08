@@ -143,6 +143,7 @@ const Profile = () => {
         console.log(1);
 
         const permissoes = await solicitarPermissoes();
+
         if(!permissoes) return;
 
         const resultado = await ImagePicker.launchCameraAsync({
@@ -163,6 +164,7 @@ const Profile = () => {
         console.log(2);
 
         const permissoes = await solicitarPermissoes();
+        
         if(!permissoes) return;
 
         const resultado = await ImagePicker.launchImageLibraryAsync({
@@ -185,7 +187,7 @@ const Profile = () => {
     }
 
     const imagemAntigaUrl = dadosUsuario.fotoPerfil 
-        ? `http://192.168.0.5:8000/storage/${dadosUsuario.fotoPerfil}` 
+        ? `http://10.67.5.27:8000/storage/${dadosUsuario.fotoPerfil}` 
         : null;
 
     return (
