@@ -220,7 +220,7 @@ const Calorias = () => {
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
-                            <Image source={require('../../../assets/imgs/breakfast.png')} style={{
+                            <Image source={require('../../../assets/imgs/cafedamanha.png')} style={{
                                 width: 0.1 * width,
                                 aspectRatio: 1 / 1,
                                 objectFit: 'contain',
@@ -286,7 +286,7 @@ const Calorias = () => {
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
-                            <Image source={require('../../../assets/imgs/lunch.png')} style={{
+                            <Image source={require('../../../assets/imgs/almoco.png')} style={{
                                 width: 0.1 * width,
                                 aspectRatio: 1 / 1,
                                 objectFit: 'contain',
@@ -352,7 +352,7 @@ const Calorias = () => {
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
-                            <Image source={require('../../../assets/imgs/dinner.png')} style={{
+                            <Image source={require('../../../assets/imgs/jantar.png')} style={{
                                 width: 0.1 * width,
                                 aspectRatio: 1 / 1,
                                 objectFit: 'contain',
@@ -418,7 +418,7 @@ const Calorias = () => {
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
-                            <Image source={require('../../../assets/imgs/snacks.png')} style={{
+                            <Image source={require('../../../assets/imgs/lanches.png')} style={{
                                 width: 0.1 * width,
                                 aspectRatio: 1 / 1,
                                 objectFit: 'contain',
