@@ -109,6 +109,7 @@ const Login = () => {
 
                 <Pressable style={styles.loginBtn} onPress={handleLogin}>
                     <Text style={{
+                        width: '16%',
                         fontFamily: 'Poppins-SB',
                         fontSize: 8 * scale,
                         color: '#fff',
@@ -128,6 +129,7 @@ const Login = () => {
 
                     <Pressable>
                         <Text style={{
+                            width: '100%',
                             fontFamily: 'Poppins-SB',
                             fontSize: 6 * scale,
                             color: '#7690b2ff',

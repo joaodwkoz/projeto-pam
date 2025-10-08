@@ -84,6 +84,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} onChangeText={(nm) => setNome(nm)}></TextInput>
                     </View>
                 </View>
@@ -107,6 +108,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} onChangeText={(em) => setEmail(em)}></TextInput>
                     </View>
                 </View>
@@ -130,6 +132,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} onChangeText={(sn) => setSenha(sn)}></TextInput>
                     </View>
 
@@ -158,6 +161,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
+                                color: '#000'
                             }} scrollEnabled={false} multiline={false} onChangeText={(cep) => setCep(cep)} onSubmitEditing={() => pegarCep()}></TextInput>
                         </View>
                     </View>
@@ -181,6 +185,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
+                                color: '#000'
                             }} scrollEnabled={false} multiline={false} onChangeText={(num) => setNumero(num)}></TextInput>
                         </View>
                     </View>
@@ -205,6 +210,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} editable={false} value={complemento}></TextInput>
                     </View>
                 </View>
@@ -228,6 +234,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} editable={false} value={logradouro}></TextInput>
                     </View>
                 </View>
@@ -251,6 +258,7 @@ const Signup = () => {
                             fontFamily: 'Poppins-M',
                             fontSize: 6 * scale,
                             lineHeight: 8 * scale,
+                            color: '#000'
                         }} scrollEnabled={false} multiline={false} editable={false} value={bairro}></TextInput>
                     </View>
                 </View>
@@ -275,6 +283,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
+                                color: '#000'
                             }} scrollEnabled={false} multiline={false} editable={false} value={cidade}></TextInput>
                         </View>
                     </View>
@@ -298,6 +307,7 @@ const Signup = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 6 * scale,
                                 lineHeight: 8 * scale,
+                                color: '#000'
                             }} scrollEnabled={false} multiline={false} editable={false} value={estado}></TextInput>
                         </View>
                     </View>

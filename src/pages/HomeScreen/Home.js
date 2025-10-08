@@ -116,9 +116,9 @@ const Home = () => {
                     </Pressable>
 
                     <View style={styles.otherApps}>
-                        <View style={styles.app}></View>
+                        <Pressable style={styles.app} onPress={() => navigation.navigate('Agua')}></Pressable>
 
-                        <View style={styles.app}></View>
+                        <Pressable style={styles.app}></Pressable>
                     </View>
                 </View>
             </View>
