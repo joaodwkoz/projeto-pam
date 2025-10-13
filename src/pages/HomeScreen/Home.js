@@ -26,7 +26,7 @@ const Home = () => {
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `http://10.67.5.27:8000/storage/${usuario.fotoPerfil}` 
+        ? `http://192.168.0.7:8000/storage/${usuario.fotoPerfil}` 
         : null;
 
     return (
@@ -52,7 +52,7 @@ const Home = () => {
                         <Text style={{
                             width: '100%',
                             fontFamily: 'Poppins-M',
-                            fontSize: 5 * scale,
+                            fontSize: 4.5 * scale,
                             color: '#6A84AA'
                         }}>{data.getDate()} de {['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][data.getMonth()]} de 2025</Text>
                     </View>
@@ -92,18 +92,6 @@ const Home = () => {
                         color: '#6C83A1',
                         flexShrink: 1,
                     }}>Aplicações</Text>
-
-                    <Pressable style={{
-                        width: '40%',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <Text style={{
-                            fontFamily: 'Poppins-SB',
-                            fontSize: 7 * scale,
-                            color: '#546A87',
-                        }}>Ver todas</Text>
-                    </Pressable>
                 </View>
 
                 <View style={styles.appsContainer}>

@@ -183,7 +183,7 @@ const Profile = () => {
     }
 
     if(isLoading){
-        return <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
+        return <ActivityIndicator color='#6C83A1' size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
 
     const imagemAntigaUrl = dadosUsuario.fotoPerfil 

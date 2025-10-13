@@ -137,8 +137,9 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         top: 0.115 * height,
         backgroundColor: '#324156',
         borderRadius: 0.015 * width,
-        zIndex: 9999,
+        zIndex: 100,
         padding: 0.0222 * width,
+        overflow: 'visible',
     },
 
     option: {

@@ -121,6 +121,7 @@ const Login = () => {
                 <View style={styles.accountOptions}>
                     <Pressable onPress={() => navigation.navigate('Signup')}>
                         <Text style={{
+                            width: '100%',
                             fontFamily: 'Poppins-SB',
                             fontSize: 6 * scale,
                             color: '#567091ff',
@@ -133,7 +134,7 @@ const Login = () => {
                             fontFamily: 'Poppins-SB',
                             fontSize: 6 * scale,
                             color: '#7690b2ff',
-                        }}>Esqueceu a senha?</Text>
+                        }}>Esqueceu sua senha?</Text>
                     </Pressable>
                 </View>
 
@@ -148,6 +149,7 @@ const Login = () => {
                         <Pressable style={styles.orLoginWithBtn}>
                             <FontAwesome name='google' color='#6C83A1' size={0.0444 * width} />
                             <Text style={{
+                                width: '40.5%',
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
                                 lineHeight: 9 * scale,
@@ -158,6 +160,7 @@ const Login = () => {
                         <Pressable style={styles.orLoginWithBtn}>
                             <FontAwesome name='facebook-f' color='#6C83A1' size={0.0444 * width} />
                             <Text style={{
+                                width: '55.1%',
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
                                 lineHeight: 7.7 * scale,
