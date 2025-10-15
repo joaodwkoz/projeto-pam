@@ -11,8 +11,9 @@ import Home from './src/pages/HomeScreen/Home';
 import Login from './src/pages/LoginScreen/Login';
 import Signup from './src/pages/SignupScreen/Signup';
 import Calorias from './src/pages/CaloriasScreen/Calorias';
-import Profile from './src/pages/ProfileScreen/Profile'
-import Agua from './src/pages/AguaScreen/Agua'
+import Profile from './src/pages/ProfileScreen/Profile';
+import Agua from './src/pages/AguaScreen/Agua';
+import Imc from './src/pages/ImcScreen/Imc';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ const AppNavigation = () => {
               <Stack.Screen name="Calorias" component={Calorias} />
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="Agua" component={Agua} />
+              <Stack.Screen name="Imc" component={Imc} />
             </>
           ) : (
             <>

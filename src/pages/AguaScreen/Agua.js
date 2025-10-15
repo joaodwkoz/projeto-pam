@@ -351,7 +351,7 @@ const Agua = () => {
               <ActivityIndicator color='#6C83A1' size="small" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
             ): (
               copos.map((c, i) => (
-                <View style={styles.cup}>
+                <View style={styles.cup} key={i}>
                   <Pressable style={styles.cupBox} onPress={() => handleNewConsumo(c.capacidade_ml, c.id)} onLongPress={() => {
                     setCopo(c.id);
                     handleOpenUpdateModal(c.nome, c.capacidade_ml, c.icone.id);
