@@ -14,6 +14,7 @@ import Calorias from './src/pages/CaloriasScreen/Calorias';
 import Profile from './src/pages/ProfileScreen/Profile';
 import Agua from './src/pages/AguaScreen/Agua';
 import Imc from './src/pages/ImcScreen/Imc';
+import Alergias from './src/pages/AlergiasScreen/Alergias';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const AppNavigation = () => {
               <Stack.Screen name="Profile" component={Profile} />
               <Stack.Screen name="Agua" component={Agua} />
               <Stack.Screen name="Imc" component={Imc} />
+              <Stack.Screen name="Alergias" component={Alergias} />
             </>
           ) : (
             <>

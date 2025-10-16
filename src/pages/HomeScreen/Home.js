@@ -106,7 +106,7 @@ const Home = () => {
                     <View style={styles.otherApps}>
                         <Pressable style={styles.app} onPress={() => navigation.navigate('Agua')}></Pressable>
 
-                        <Pressable style={styles.app} onPress={() => navigation.navigate('Imc')}></Pressable>
+                        <Pressable style={styles.app} onPress={() => navigation.navigate('Alergias')}></Pressable>
                     </View>
                 </View>
             </View>
