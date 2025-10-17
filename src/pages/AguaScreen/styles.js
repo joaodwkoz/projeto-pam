@@ -106,7 +106,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     },
 
     modal: {
-        width: '80%',
+        width: '82%',
         backgroundColor: '#fefefe',
         borderRadius: 0.025 * height,
         padding: 0.0444 * height,

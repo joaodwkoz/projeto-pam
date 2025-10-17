@@ -1,6 +1,7 @@
 import { View, Pressable, Image, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView } from 'react-native';
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useFonts } from 'expo-font';
+import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../../contexts/AuthContext';
 import api from '../../../services/api';
@@ -260,8 +261,8 @@ const Alergias = () => {
                 </View>
             </ScrollView>
 
-            <Modal visible={mostrarModal} transparent>
-                <View style={styles.allergyModalContainer}>
+            <Modal visible={mostrarModal} transparent animationType='slide'>
+                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.allergyModalContainer}>
                     <View style={styles.allergyModal}>
                         <Text style={{
                             fontFamily: 'Poppins-M',
@@ -317,7 +318,7 @@ const Alergias = () => {
                                 }} contentContainerStyle={{
                                     gap: 0.0222 * width,
                                 }} showsVerticalScrollIndicator={false}>
-                                    { CATEGORIAS.map((c, i) => (
+                                    {CATEGORIAS.map((c, i) => (
                                         <Pressable style={styles.allergyModalOption} key={i} onPress={() => {
                                             setCategoriaEscolhida(i);
                                             setMostrarCategorias(false);
@@ -427,9 +428,9 @@ const Alergias = () => {
                                         <View style={styles.allergyModalReaction} key={i}>
                                             <Text style={{
                                                 fontFamily: 'Poppins-M',
-                                                fontSize: 7 * scale,
+                                                fontSize: 6 * scale,
                                                 color: '#6C83A1',
-                                                lineHeight: 7.7 * scale 
+                                                lineHeight: 8 * scale 
                                             }}>{r}</Text>
 
                                             <Pressable onPress={() => setReacoes(prev => prev.filter((v, index) => index !== i))}>
@@ -461,7 +462,7 @@ const Alergias = () => {
                             </Pressable>
                         </View>
                     </View>
-                </View>
+                </BlurView>
             </Modal>
         </View>
     )
