@@ -1,3 +1,4 @@
 - navegação
 - em alergia, deixar o modal igual o scroll do glicemia, com scrollview
+- lentidão em glicemias
 - ligar alergias/imc/glicemias com o back-end
