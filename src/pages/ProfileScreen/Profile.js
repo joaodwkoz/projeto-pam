@@ -187,7 +187,7 @@ const Profile = () => {
     }
 
     const imagemAntigaUrl = dadosUsuario.fotoPerfil 
-        ? `http://10.67.5.27:8000/storage/${dadosUsuario.fotoPerfil}` 
+        ? `http://10.113.129.192:8000/storage/${dadosUsuario.fotoPerfil}` 
         : null;
 
     return (
