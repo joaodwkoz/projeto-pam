@@ -121,6 +121,16 @@ const Home = () => {
                     }}>Metas do dia</Text>
                 </View>
             </View>
+
+            <View style={styles.navbar}>
+                <View style={styles.navbarApp}></View>
+
+                <View style={styles.navbarApp}></View>
+
+                <View style={styles.navbarApp}></View>
+
+                <View style={styles.navbarApp}></View>
+            </View>
         </View>
     )
 }
