@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 
@@ -17,6 +18,7 @@ import Imc from './src/pages/ImcScreen/Imc';
 import Alergias from './src/pages/AlergiasScreen/Alergias';
 import Glicemia from './src/pages/GlicemiaScreen/Glicemia';
 import Meditacao from './src/pages/MeditacaoScreen/Meditacao';
+import Batimentos from './src/pages/BatimentosScreen/Batimentos';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +45,7 @@ const AppNavigation = () => {
               <Stack.Screen name="Alergias" component={Alergias} />
               <Stack.Screen name="Glicemia" component={Glicemia} />
               <Stack.Screen name="Meditacao" component={Meditacao} />
+              <Stack.Screen name="Batimentos" component={Batimentos} />
             </>
           ) : (
             <>

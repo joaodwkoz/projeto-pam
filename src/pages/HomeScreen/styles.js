@@ -104,12 +104,18 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#fff',
         flexDirection: 'row',
         gap: 0.0444 * width,
-        borderRadius: 9999
+        borderRadius: 9999,
+    },
+
+    navbarAppSelected: {
+        flex: 2,
+        backgroundColor: '#bbcce4bf',
+        borderRadius: 9999,
     },
 
     navbarApp: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#bbcce4bf',
         borderRadius: 9999,
     },
 });

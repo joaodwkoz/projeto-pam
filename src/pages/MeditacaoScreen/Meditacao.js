@@ -18,7 +18,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { dynamicStyles } from './styles';
 
 
-const Imc = () => {
+const Meditacao = () => {
     const { width, height } = useWindowDimensions();
     
     const styles = dynamicStyles(width, height);
@@ -93,4 +93,4 @@ const Imc = () => {
     )
 }
 
-export default Imc;
+export default Meditacao;

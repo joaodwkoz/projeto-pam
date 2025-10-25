@@ -26,7 +26,7 @@ const Home = () => {
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `http://10.113.129.192:8000/storage/${usuario.fotoPerfil}` 
+        ? `http://192.168.0.8:8000/storage/${usuario.fotoPerfil}` 
         : null;
 
     return (
@@ -106,7 +106,7 @@ const Home = () => {
                     <View style={styles.otherApps}>
                         <Pressable style={styles.app} onPress={() => navigation.navigate('Agua')}></Pressable>
 
-                        <Pressable style={styles.app} onPress={() => navigation.navigate('Meditacao')}></Pressable>
+                        <Pressable style={styles.app} onPress={() => navigation.navigate('Batimentos')}></Pressable>
                     </View>
                 </View>
             </View>
@@ -123,7 +123,7 @@ const Home = () => {
             </View>
 
             <View style={styles.navbar}>
-                <View style={styles.navbarApp}></View>
+                <View style={styles.navbarAppSelected}></View>
 
                 <View style={styles.navbarApp}></View>
 
