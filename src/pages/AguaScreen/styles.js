@@ -56,12 +56,13 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center',
     },
 
-    addCup: {
+    cupBtns: {
         width: '100%',
-        alignItems: 'flex-end',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
 
-    addCupBtn: {
+    cupBtn: {
         height: 0.0555 * height,
         aspectRatio: 1 / 1,
         backgroundColor: '#6C83A1',

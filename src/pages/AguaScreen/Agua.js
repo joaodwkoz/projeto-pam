@@ -16,7 +16,10 @@ import api from '../../../services/api';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Entypo from '@expo/vector-icons/Entypo';
+import Octicons from '@expo/vector-icons/Octicons';
 import { dynamicStyles } from './styles';
+
+import ModalHistorico from '../../components/ModalHistorico';
 
 function formatDateToYYYYMMDD(dateObj) {
   const year = dateObj.getFullYear();
@@ -240,6 +243,8 @@ const Agua = () => {
       }
     }
 
+    const [historicoModalVisible, setHistoricoModalVisible] = useState(false);
+
     if (isLoadingCups || isLoadingConsumos || !fontsLoaded) {
       return <ActivityIndicator color='#6C83A1' size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
@@ -336,8 +341,12 @@ const Agua = () => {
               }} text={progressText} />
           </View>
 
-          <View style={styles.addCup}>
-            <Pressable style={styles.addCupBtn} onPress={()=> setModalVisible(true)}>
+          <View style={styles.cupBtns}>
+            <Pressable style={styles.cupBtn} onPress={() => setHistoricoModalVisible(true)}>
+              <Octicons name="graph" size={24} color="#fff" />
+            </Pressable>
+
+            <Pressable style={styles.cupBtn} onPress={()=> setModalVisible(true)}>
               <Entypo name="plus" size={24} color="#fff" />
             </Pressable>
           </View>
@@ -513,6 +522,8 @@ const Agua = () => {
               </View>
             </View>
           </Modal>
+
+          <ModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} width={width} height={height} scale={scale}></ModalHistorico>
         </View>
     )
 }
