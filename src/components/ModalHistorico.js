@@ -10,6 +10,7 @@ import Animated, {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
+import { LineChart } from 'react-native-gifted-charts';
 
 const ModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const { usuario } = useContext(AuthContext);
@@ -17,12 +18,20 @@ const ModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
     const PADDING_BOTTOM = React.useMemo(() => 0.0444 * width, [width]);
 
+    const MODAL_VIEW_WIDTH = 0.82 * width;
+    const MODAL_PADDING = 0.0444 * width;
+    const CHART_CONTAINER_WIDTH = MODAL_VIEW_WIDTH - (2 * MODAL_PADDING);
+    const FINAL_CHART_WIDTH = CHART_CONTAINER_WIDTH - 20; 
+    const NUM_SPACES = 6; 
+    const FINAL_SPACING = FINAL_CHART_WIDTH / NUM_SPACES;
+
     const styles = React.useMemo(() => dynamicStyles(width, height), [width, height]);
 
     const [periodo, setPeriodo] = useState('Semana');
     const [aba, setAba] = useState('Histórico');
 
     const [history, setHistory] = useState([]);
+    const [lineData, setLineData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const BASE_URL_STORAGE = 'http://192.168.0.7:8000/';
@@ -31,8 +40,23 @@ const ModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
         setIsLoading(true);
 
         try {
-            const res = await api.get(`/usuario/${usuario.id}/consumos-por-periodo?periodo=${periodo}`); 
+            const res = await api.get(`/usuario/${usuario.id}/consumos-por-periodo?periodo=${periodo.toLowerCase()}`); 
             setHistory(res.data.historico);
+            console.log(res.data.historico);
+        } catch(e) {
+            console.error('Ocorreu um erro!', e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [usuario.id, periodo]);
+
+    const fetchChart = useCallback(async () => {
+        setIsLoading(true);
+
+        try {
+            const res = await api.get(`/usuario/${usuario.id}/consumos-grafico?periodo=${periodo.toLowerCase()}`); 
+            setLineData(res.data.dados_grafico);
+            console.log(res.data.dados_grafico);
         } catch(e) {
             console.error('Ocorreu um erro!', e);
         } finally {
@@ -43,184 +67,266 @@ const ModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
     useEffect(() => {
         if (visible) { 
             fetchHistory();
+            fetchChart();
         }
-    }, [visible, fetchHistory]);
+    }, [visible, fetchHistory, fetchChart]);
 
     return (
         <Modal transparent animation='slide' visible={visible}>
             <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>
-                {isLoading ? (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size="large" color="#6C83A1" /> 
-                    </View>
-                )
-                : (
-                    <View style={styles.modal}>
-                        <View style={styles.modalHeader}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 8 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 8.8 * scale
-                            }}>
-                                Visualizar Dados
-                            </Text>
+                <View style={styles.modal}>
+                    {!isLoading ? (
+                        <>
+                            <View style={styles.modalHeader}>
+                                <Text style={{
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 8 * scale,
+                                    color: '#6C83A1',
+                                    lineHeight: 8.8 * scale
+                                }}>
+                                    Visualizar Dados
+                                </Text>
 
-                            <Pressable style={styles.closeModalBtn} onPress={() => setVisible(false)}>
-                                <Ionicons name="close" size={24} color="#6C83A1" />
-                            </Pressable>
-                        </View>
-
-                        <View style={styles.modalBody}>
-                            <View style={styles.periodFilters}>
-                                <Pressable style={[styles.filter, { backgroundColor: periodo === 'Hoje' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Hoje')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: periodo === 'Hoje' ? '#fff' : '#6C83A1',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Hoje
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.filter, { backgroundColor: periodo === 'Semana' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Semana')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: periodo === 'Semana' ? '#fff' : '#6C83A1',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Semana
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.filter, { backgroundColor: periodo === 'Mês' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Mês')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: periodo === 'Mês' ? '#fff' : '#6C83A1',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Mês
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.filter, { backgroundColor: periodo === 'Ano' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Ano')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: periodo === 'Ano' ? '#fff' : '#6C83A1',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Ano
-                                    </Text>
+                                <Pressable style={styles.closeModalBtn} onPress={() => setVisible(false)}>
+                                    <Ionicons name="close" size={24} color="#6C83A1" />
                                 </Pressable>
                             </View>
 
-                            <View style={styles.tabSwitch}>
-                                <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Histórico
-                                    </Text>
-                                </Pressable>
+                            <View style={styles.modalBody}>
+                                <View style={styles.periodFilters}>
+                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Hoje' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Hoje')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: periodo === 'Hoje' ? '#fff' : '#6C83A1',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            24h
+                                        </Text>
+                                    </Pressable>
 
-                                <Pressable style={styles.tab} onPress={() => setAba('Gráficos')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: aba === 'Gráficos' ? '#6C83A1' : '#6C83A140',
-                                        lineHeight: 9 * scale
-                                    }}>
-                                        Gráficos
-                                    </Text>
-                                </Pressable>
+                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Semana' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Semana')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: periodo === 'Semana' ? '#fff' : '#6C83A1',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            7d
+                                        </Text>
+                                    </Pressable>
 
-                                <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? 0.0125 * width : 0.23 * width }]}></View>
-                            </View>
+                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Mes' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Mes')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: periodo === 'Mes' ? '#fff' : '#6C83A1',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            30d
+                                        </Text>
+                                    </Pressable>
 
-                            <View style={styles.tabContent}>
-                                {
-                                    aba === 'Histórico' && (
-                                        <SectionList
-                                            sections={history}
-                                            keyExtractor={(item, index) => item + index}
-                                            renderItem={({item}) => (
-                                                <View style={styles.historyItem}>
-                                                    <Image source={{uri: item.copo_icone_caminho ? BASE_URL_STORAGE + item.copo_icone_caminho : null}} 
-                                                        style={{ height: '100%', aspectRatio: 1 / 1,   objectFit: 'contain' }} 
-                                                    />
-                                                    
-                                                    <View style={styles.historyItemInfo}>
-                                                        <Text style={{
-                                                            fontFamily: 'Poppins-M',
-                                                            fontSize: 6 * scale,
-                                                            color: '#6C83A1',
-                                                            lineHeight: 9 * scale
-                                                        }}>
-                                                            {item.volume_ml} ml - {item.copo_nome}
-                                                        </Text>
-                                                        
-                                                        <Text style={{ 
+                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Ano' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Ano')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: periodo === 'Ano' ? '#fff' : '#6C83A1',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            365d
+                                        </Text>
+                                    </Pressable>
+                                </View>
+
+                                <View style={styles.tabSwitch}>
+                                    <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            Histórico
+                                        </Text>
+                                    </Pressable>
+
+                                    <Pressable style={styles.tab} onPress={() => setAba('Gráficos')}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: aba === 'Gráficos' ? '#6C83A1' : '#6C83A140',
+                                            lineHeight: 9 * scale
+                                        }}>
+                                            Gráficos
+                                        </Text>
+                                    </Pressable>
+
+                                    <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? 0.0125 * width : 0.23 * width }]}></View>
+                                </View>
+
+                                <View style={styles.tabContent}>
+                                    {
+                                        aba === 'Histórico' ? (
+                                            history.length > 0 ? (
+                                                <SectionList
+                                                    sections={history}
+                                                    keyExtractor={(item, index) => item + index}
+                                                    renderItem={({item}) => (
+                                                        <View style={styles.historyItem}>
+                                                            <Image source={{uri: item.copo_icone_caminho ? BASE_URL_STORAGE + item.copo_icone_caminho : null}} 
+                                                                style={{ height: '100%', aspectRatio: 1 / 1,   objectFit: 'contain' }} 
+                                                            />
+                                                            
+                                                            <View style={styles.historyItemInfo}>
+                                                                <Text style={{
+                                                                    fontFamily: 'Poppins-M',
+                                                                    fontSize: 6 * scale,
+                                                                    color: '#6C83A1',
+                                                                    lineHeight: 9 * scale
+                                                                }}>
+                                                                    {item.volume_ml} ml - {item.copo_nome}
+                                                                </Text>
+                                                                
+                                                                <Text style={{ 
+                                                                    fontFamily: 'Poppins-M',
+                                                                    fontSize: 5 * scale,
+                                                                    color: '#6C83A1',
+                                                                    lineHeight: 8 * scale
+                                                                }}>{item.hora}</Text>
+                                                            </View>
+                                                        </View>
+                                                    )}
+                                                    ItemSeparatorComponent={() => (
+                                                        <View style={{
+                                                            width: '100%',
+                                                            height: 0.0444 * width,
+                                                        }}></View>
+                                                    )}
+                                                    renderSectionHeader={({ section }) => 
+                                                        {
+                                                            const sectionIndex = history.indexOf(section);
+                                                            const isFirst = sectionIndex === 0;
+                                                            const isLast = sectionIndex === history.length - 1;
+
+                                                            let headerStyles = {
+                                                                fontFamily: 'Poppins-M',
+                                                                fontSize: 7 * scale,
+                                                                color: '#6C83A1',
+                                                                lineHeight: 10 * scale,
+                                                                paddingBottom: 0,
+                                                                paddingTop: 0,
+                                                            };
+
+                                                            if (isFirst) {
+                                                                headerStyles.paddingBottom = PADDING_BOTTOM;
+                                                                headerStyles.paddingTop = 0;
+                                                            } else if (isLast) {
+                                                                headerStyles.paddingTop = PADDING_VERTICAL;
+                                                                headerStyles.paddingBottom = 0;
+                                                            } else {
+                                                                headerStyles.paddingTop = PADDING_VERTICAL;
+                                                                headerStyles.paddingBottom = PADDING_BOTTOM;
+                                                            }
+
+                                                            return (
+                                                                <Text style={headerStyles}>
+                                                                    {section.title} ({section.total_diario}ml)
+                                                                </Text>
+                                                            );
+                                                        }
+                                                    }
+                                                />
+                                            ) : (
+                                                <View style={{
+                                                    height: 0.1 * height,
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}>
+                                                    <Text style={{
+                                                        fontFamily: 'Poppins-M',
+                                                        fontSize: 8 * scale,
+                                                        color: '#6C83A1',
+                                                        lineHeight: 11 * scale,
+                                                    }}>
+                                                        Sem dados para mostrar
+                                                    </Text>
+                                                </View>
+                                            )
+                                        ) : (
+                                            lineData && lineData.length > 0 ? ( 
+                                                <View
+                                                    style={{
+                                                        width: '100%',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        overflow: 'hidden',
+                                                    }}
+                                                    >
+                                                    <LineChart
+                                                        data={lineData}
+                                                        areaChart
+                                                        startFillColor="#6C83A1"
+                                                        endFillColor="#fff"
+                                                        startOpacity={0.5}
+                                                        endOpacity={0}
+                                                        bezier
+                                                        smoothness={0.7}
+                                                        thickness={2}
+                                                        yAxisColor="#6C83A1"
+                                                        xAxisColor="#6C83A1"
+                                                        xAxisThickness={1}
+                                                        yAxisThickness={1}
+                                                        AxisExtraSpace={20}
+                                                        color="#6C83A1"
+                                                        height={0.25 * height}
+                                                        width={CHART_CONTAINER_WIDTH * 0.95}
+                                                        dataPointsColor="#6C83A1"
+                                                        dataPointsWidth={8}
+                                                        dataPointsHeight={8}
+                                                        xAxisLabelTextStyle={{
                                                             fontFamily: 'Poppins-M',
                                                             fontSize: 5 * scale,
                                                             color: '#6C83A1',
-                                                            lineHeight: 8 * scale
-                                                         }}>{item.hora}</Text>
-                                                    </View>
+                                                        }}
+                                                        yAxisTextStyle={{
+                                                            fontFamily: 'Poppins-M',
+                                                            fontSize: 5 * scale,
+                                                            color: '#6C83A1',
+                                                        }}
+                                                        minValue={0}
+                                                        maxValue={4000}
+                                                        yAxisLabelWidth={0.1 * width}
+                                                        isSecondaryDataPoints
+                                                    />
                                                 </View>
-                                            )}
-                                            ItemSeparatorComponent={() => (
+                                            ) : (
                                                 <View style={{
-                                                    width: '100%',
-                                                    height: 0.0444 * width,
-                                                }}></View>
-                                            )}
-                                            renderSectionHeader={({ section }) => 
-                                                {
-                                                    const sectionIndex = history.indexOf(section);
-                                                    const isFirst = sectionIndex === 0;
-                                                    const isLast = sectionIndex === history.length - 1;
-
-                                                    let headerStyles = {
+                                                    height: 0.1 * height,
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}>
+                                                    <Text style={{
                                                         fontFamily: 'Poppins-M',
-                                                        fontSize: 7 * scale,
+                                                        fontSize: 8 * scale,
                                                         color: '#6C83A1',
-                                                        lineHeight: 10 * scale,
-                                                        paddingBottom: 0,
-                                                        paddingTop: 0,
-                                                    };
-
-                                                    if (isFirst) {
-                                                        headerStyles.paddingBottom = PADDING_BOTTOM;
-                                                        headerStyles.paddingTop = 0;
-                                                    } else if (isLast) {
-                                                        headerStyles.paddingTop = PADDING_VERTICAL;
-                                                        headerStyles.paddingBottom = 0;
-                                                    } else {
-                                                        headerStyles.paddingTop = PADDING_VERTICAL;
-                                                        headerStyles.paddingBottom = PADDING_BOTTOM;
-                                                    }
-
-                                                    return (
-                                                        <Text style={headerStyles}>
-                                                            {section.title} ({section.total_diario}ml)
-                                                        </Text>
-                                                    );
-                                                }
-                                            }
-                                        />
-                                    )
-                                }
+                                                        lineHeight: 11 * scale,
+                                                    }}>
+                                                        Sem dados para mostrar
+                                                    </Text>
+                                                </View>  
+                                            )
+                                        )
+                                    }
+                                </View>
                             </View>
+                        </>
+                    ) : (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <ActivityIndicator size="large" color="#6C83A1" /> 
                         </View>
-                    </View>
-                )}
+                    )}
+                </View>
             </BlurView>
         </Modal>
     );
