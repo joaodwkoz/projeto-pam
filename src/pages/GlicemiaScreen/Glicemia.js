@@ -72,7 +72,7 @@ const Glicemia = () => {
 
     const [mostrarModal, setMostrarModal] = useState(false);
 
-    const abrirModal = () => setMostrarModal(true);
+    const handleOpenModal = () => setMostrarModal(true);
 
     const [valor, setValor] = useState(0);
     const [tipoMedicao, setTipoMedicao] = useState("");
@@ -85,8 +85,12 @@ const Glicemia = () => {
     });
     const [observacoes, setObservacoes] = useState("");
 
-    const fecharModal = () => {
+    const handleCloseModal = () => {
         setMostrarModal(false);
+        clearModal()
+    }
+
+    const clearModal = () => {
         setValor(0);
         setTipoMedicao("");
         setHorario({
@@ -153,7 +157,7 @@ const Glicemia = () => {
                         <Feather name="filter" size={24} color="#fff" />
                     </Pressable>
 
-                    <Pressable style={styles.historyBtn} onPress={abrirModal}>
+                    <Pressable style={styles.historyBtn} onPress={handleOpenModal}>
                         <Entypo name="plus" size={24} color="#fff" />
                     </Pressable>
                 </View>
@@ -205,7 +209,7 @@ const Glicemia = () => {
 
             <GlicemiaModal 
                 visible={mostrarModal}
-                fecharModal={fecharModal}
+                fecharModal={handleCloseModal}
                 horario={horario}
                 setHorario={setHorario}
                 tipoMedicao={tipoMedicao}

@@ -22,6 +22,20 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const getImcIndicator = (imc) => {
+        if (imc < 20) {
+            return '#a8d0e6';
+        } else if (imc < 25) {
+            return '#b0e3c7';
+        } else if (imc < 30) {
+            return '#fff1a8';
+        } else if (imc < 35) {
+            return '#ffd3a8';
+        } else {
+            return '#f4978e';
+        }
+    }
+
     const fetchHistory = useCallback(async () => {
         setIsLoading(true);
 
@@ -71,6 +85,8 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                                             keyExtractor={(item, index) => item + index}
                                             renderItem={({item}) => (
                                                 <View style={styles.historyItem}>
+                                                    <View style={[styles.historyItemIndicator, { backgroundColor: getImcIndicator(item.imc) }]}></View>
+
                                                     <View style={styles.historyItemInfo}>
                                                         <Text style={{
                                                             fontFamily: 'Poppins-M',
@@ -242,6 +258,12 @@ const dynamicStyles = (width, height) => StyleSheet.create({
     tabContent: {
         maxHeight: 0.3 * height,
         width: '100%',
+    },
+
+    historyItemIndicator: {
+        height: '50%',
+        aspectRatio: 1 / 1,
+        borderRadius: 9999,
     },
 
     historyItem: {
