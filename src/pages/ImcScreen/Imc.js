@@ -6,7 +6,7 @@ import Animated, {
   useDerivedValue
 } from 'react-native-reanimated';
 import { ReText } from 'react-native-redash';
-import { useState, useEffect, useContext, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback, useMemo, memo } from 'react';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../../contexts/AuthContext';
@@ -20,6 +20,7 @@ import { dynamicStyles } from './styles';
 import WheelPicker from '@quidone/react-native-wheel-picker';
 
 import Velocimetro from '../../components/Velocimetro';
+import ImcModalHistorico from '../../components/ImcModalHistorico';
 
 const alturas = [...Array(161).keys()].map((i) => ({
     value: i + 40,
@@ -34,14 +35,9 @@ const pesosInteiro = [...Array(181).keys()].map((i) => ({
 const pesosDecimal = [...Array(10).keys()].map((i) => ({
     value: i,
     label: i.toString()
-}))
+}));
 
-function formatDateToYYYYMMDD(dateObj) {
-  const year = dateObj.getFullYear();
-  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const day = String(dateObj.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+const MemoizedWheelPicker = memo(WheelPicker);
 
 const Imc = () => {
     const { width, height } = useWindowDimensions();
@@ -63,13 +59,57 @@ const Imc = () => {
     const [pesoInteiro, setPesoInteiro] = useState(20);
     const [pesoDecimal, setPesoDecimal] = useState(0);
     const [peso, setPeso] = useState(20.0);
-    const [imc, setImc] = useState(20);
+    const [imc, setImc] = useState(15);
     const [velocimetroSize, setVelocimetroSize] = useState({ width: 0, height: 0 });
+    const [ultimoRegistro, setUltimoRegistro] = useState(null);
 
-    const calcularImc = () => {
-        let imcCalculado = parseFloat(peso) / (altura * altura / 10000);
-        setImc(imcCalculado.toFixed(2));
+    const fetchLatestRegistry = useCallback(async () => {
+        try {
+            const res = await api.get(`/usuario/${usuario.id}/imc/ultimo`);
+        
+            const ultimoRegistro = res.data; 
+
+            setUltimoRegistro(ultimoRegistro);
+
+            if (ultimoRegistro) { 
+                const alturaCm = Math.round(ultimoRegistro.altura * 100); 
+                setAltura(alturaCm);
+
+                const pesoInt = Math.floor(ultimoRegistro.peso);
+                const pesoDec = Math.round((ultimoRegistro.peso - pesoInt) * 10);
+
+                setPesoInteiro(pesoInt);
+                setPesoDecimal(pesoDec);
+                setPeso(parseFloat((pesoInt + pesoDec / 10).toFixed(1)));
+            }
+        } catch(e) {
+            console.error('Ocorreu um erro ao pegar o ultimo registro', e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [usuario.id]);
+
+    const handleSaveImc = async () => {
+        const dados = {
+            peso: peso,
+            altura: altura / 100.0,
+        }
+
+        try {
+            await api.post('/imc', dados);
+            fetchLatestRegistry();
+        } catch(e) {
+            console.error('Erro salvar o IMC', e);
+        }
     }
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    const [historicoModalVisible, setHistoricoModalVisible] = useState(false);
+
+    useEffect(() => {
+        fetchLatestRegistry();
+    }, [fetchLatestRegistry]);
 
     return (
         <View style={styles.container}>
@@ -91,25 +131,37 @@ const Imc = () => {
             }}>Índice de Massa Corporal</Text>
 
             <View style={styles.result}>
-                <Text style={{
-                    fontFamily: 'Poppins-M',
-                    fontSize: 8.5 * scale,
-                    color: '#6C83A1',
-                    lineHeight: 9.35 * scale
-                }}>Seu IMC é de: {imc}!</Text>
+                {
+                    isLoading ? (
+                        <View style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <ActivityIndicator color='#6C83A1' size="large" /> 
+                        </View>
+                    ) : (
+                        <>
+                            <Text style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 8.5 * scale,
+                                color: '#6C83A1',
+                                lineHeight: 9.35 * scale
+                            }}>Seu IMC é de: {ultimoRegistro?.imc ?? 15}!</Text>
 
-                <View style={styles.resultInfo}onLayout={(event) => {
-                    const { width, height } = event.nativeEvent.layout;
-                    setVelocimetroSize({ width, height });
-                }}>
-                    {velocimetroSize.width > 0 && (
-                        <Velocimetro
-                        velocidade={imc}
-                        width={velocimetroSize.width}
-                        height={velocimetroSize.height}
-                        />
-                    )}
-                </View>
+                            <View style={styles.resultInfo}onLayout={(event) => {
+                                const { width, height } = event.nativeEvent.layout;
+                                setVelocimetroSize({ width, height });
+                            }}>
+                                <Velocimetro
+                                    velocidade={ultimoRegistro?.imc ?? 15}
+                                    width={velocimetroSize.width}
+                                    height={velocimetroSize.height}
+                                />
+                            </View>
+                        </>
+                    )
+                }
             </View>
 
             <View style={styles.wheelInput}>
@@ -121,7 +173,7 @@ const Imc = () => {
                 }}>Altura: {altura}cm</Text>
 
                 <View style={styles.wheel}>
-                    <WheelPicker
+                    <MemoizedWheelPicker
                         data={alturas}
                         value={altura}
                         enableScrollByTapOnItem={true}
@@ -151,7 +203,7 @@ const Imc = () => {
                 }}>Peso: {peso}kg</Text>
 
                 <View style={[styles.wheel, { gap: 0.0444 * width }]}>
-                    <WheelPicker
+                    <MemoizedWheelPicker
                         data={pesosInteiro}
                         value={pesoInteiro}
                         enableScrollByTapOnItem={true}
@@ -173,7 +225,7 @@ const Imc = () => {
                         }}
                     />
 
-                    <WheelPicker
+                    <MemoizedWheelPicker
                         data={pesosDecimal}
                         value={pesoDecimal}
                         enableScrollByTapOnItem={true}
@@ -198,7 +250,7 @@ const Imc = () => {
             </View>
 
             <View style={styles.actions}>
-                <Pressable style={[styles.btn, { backgroundColor: '#fff' }]}>
+                <Pressable style={[styles.btn, { backgroundColor: '#fff' }]} onPress={() => setHistoricoModalVisible(true)}>
                     <Text style={{
                         fontFamily: 'Poppins-M',
                         fontSize: 7.5 * scale,
@@ -207,7 +259,7 @@ const Imc = () => {
                     }}>Histórico</Text>
                 </Pressable>
 
-                <Pressable style={[styles.btn, { backgroundColor: '#6C83A1' }]} onPress={() => calcularImc()}>
+                <Pressable style={[styles.btn, { backgroundColor: '#6C83A1' }]} onPress={() => handleSaveImc()}>
                     <Text style={{
                         fontFamily: 'Poppins-M',
                         fontSize: 7.5 * scale,
@@ -216,6 +268,8 @@ const Imc = () => {
                     }}>Calcular</Text>
                 </Pressable>
             </View>
+
+            <ImcModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} height={height} width={width} scale={scale}></ImcModalHistorico>
         </View>
     )
 }

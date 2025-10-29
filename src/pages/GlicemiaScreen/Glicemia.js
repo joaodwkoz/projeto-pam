@@ -20,13 +20,6 @@ import { dynamicStyles } from './styles';
 
 import GlicemiaModal from '../../components/GlicemiaModal';
 
-function formatDateToYYYYMMDD(dateObj) {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
 const data = new Date();
 const dataAtual = {
     dia: data.getDate(),

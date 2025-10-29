@@ -49,6 +49,17 @@ const Batimentos = () => {
         }
     }
 
+    const getCondicao = (condicao) => {
+        const mp = {
+            'repouso': 'Repouso',
+            'pos_exercicio': 'Pós-exercício',
+            'monitoramento': 'Monitoramento',
+            'aleatorio': 'Aleatório'
+        }
+
+        return mp[condicao];
+    }
+
     const bottomSheetRef = useRef(null);
     const [sheetIndex, setSheetIndex] = useState(-1);
     const snapPoints = useMemo(() => [height * 0.6], []);
