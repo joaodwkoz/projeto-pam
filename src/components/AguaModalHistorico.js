@@ -12,7 +12,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import { LineChart } from 'react-native-gifted-charts';
 
-const ModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
+const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const { usuario } = useContext(AuthContext);
 
     const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
@@ -431,4 +431,4 @@ const dynamicStyles = (width, height) => StyleSheet.create({
     }
 });
 
-export default ModalHistorico;
+export default AguaModalHistorico;

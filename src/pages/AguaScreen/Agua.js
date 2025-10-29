@@ -19,7 +19,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Octicons from '@expo/vector-icons/Octicons';
 import { dynamicStyles } from './styles';
 
-import ModalHistorico from '../../components/ModalHistorico';
+import AguaModalHistorico from '../../components/AguaModalHistorico';
 
 function formatDateToYYYYMMDD(dateObj) {
   const year = dateObj.getFullYear();
@@ -523,7 +523,7 @@ const Agua = () => {
             </View>
           </Modal>
 
-          <ModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} width={width} height={height} scale={scale}></ModalHistorico>
+          <AguaModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} width={width} height={height} scale={scale}></AguaModalHistorico>
         </View>
     )
 }
