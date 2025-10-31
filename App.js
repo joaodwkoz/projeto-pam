@@ -18,6 +18,7 @@ import Alergias from './src/pages/AlergiasScreen/Alergias';
 import Glicemia from './src/pages/GlicemiaScreen/Glicemia';
 import Meditacao from './src/pages/MeditacaoScreen/Meditacao';
 import Batimentos from './src/pages/BatimentosScreen/Batimentos';
+import { AlertProvider } from './providers/AlertProvider';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,30 +31,32 @@ const AppNavigation = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{
-          headerShown: false,
-        }}>
-          {signed ? (
-            <>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Calorias" component={Calorias} />
-              <Stack.Screen name="Profile" component={Profile} />
-              <Stack.Screen name="Agua" component={Agua} />
-              <Stack.Screen name="Imc" component={Imc} />
-              <Stack.Screen name="Alergias" component={Alergias} />
-              <Stack.Screen name="Glicemia" component={Glicemia} />
-              <Stack.Screen name="Meditacao" component={Meditacao} />
-              <Stack.Screen name="Batimentos" component={Batimentos} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="Signup" component={Signup} />
-            </>
-          )}
+      <AlertProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{
+            headerShown: false,
+          }}>
+            {signed ? (
+              <>
+                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Calorias" component={Calorias} />
+                <Stack.Screen name="Profile" component={Profile} />
+                <Stack.Screen name="Agua" component={Agua} />
+                <Stack.Screen name="Imc" component={Imc} />
+                <Stack.Screen name="Alergias" component={Alergias} />
+                <Stack.Screen name="Glicemia" component={Glicemia} />
+                <Stack.Screen name="Meditacao" component={Meditacao} />
+                <Stack.Screen name="Batimentos" component={Batimentos} />
+              </>
+            ) : (
+              <>
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Signup" component={Signup} />
+              </>
+            )}
         </Stack.Navigator>
       </NavigationContainer>
+      </AlertProvider>
     </GestureHandlerRootView>
   )
 }

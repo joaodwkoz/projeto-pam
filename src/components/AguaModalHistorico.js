@@ -30,8 +30,8 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
     const [periodo, setPeriodo] = useState('Semana');
     const [aba, setAba] = useState('Histórico');
 
-    const [history, setHistory] = useState([]);
-    const [lineData, setLineData] = useState([]);
+    const [history, setHistory] = useState(null);
+    const [lineData, setLineData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const BASE_URL_STORAGE = 'http://192.168.0.7:8000/';
@@ -168,7 +168,7 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
                                 <View style={styles.tabContent}>
                                     {
                                         aba === 'Histórico' ? (
-                                            history.length > 0 ? (
+                                            history && history.length > 0 ? (
                                                 <SectionList
                                                     sections={history}
                                                     keyExtractor={(item, index) => item + index}

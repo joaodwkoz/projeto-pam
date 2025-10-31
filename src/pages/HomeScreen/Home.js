@@ -26,7 +26,7 @@ const Home = () => {
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `http://10.126.236.192:8000/storage/${usuario.fotoPerfil}` 
+        ? `http://192.168.0.8:8000/storage/${usuario.fotoPerfil}` 
         : null;
 
     if (!fontsLoaded) {
