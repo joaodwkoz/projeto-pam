@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { dynamicStyles } from './styles';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const Login = () => {
     const { width, height } = useWindowDimensions();

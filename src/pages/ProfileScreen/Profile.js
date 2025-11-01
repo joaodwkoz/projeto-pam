@@ -7,8 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { dynamicStyles } from './styles';
 import { useNavigation } from '@react-navigation/native';
-import api from '../../../services/api';
-import { AuthContext } from '../../../contexts/AuthContext';
+import api from '../../services/api';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const Profile = () => {
     const { width, height } = useWindowDimensions();

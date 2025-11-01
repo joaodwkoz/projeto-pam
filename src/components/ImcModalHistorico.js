@@ -8,8 +8,8 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { AuthContext } from "../../contexts/AuthContext";
-import api from "../../services/api";
+import { AuthContext } from "../contexts/AuthContext";
+import api from "../services/api";
 
 const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const { usuario } = useContext(AuthContext);

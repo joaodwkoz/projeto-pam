@@ -8,12 +8,12 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { AuthContext } from "../../contexts/AuthContext";
-import api from "../../services/api";
+import { useAuth } from "../hooks/useAuth";
+import api from "../services/api";
 import { LineChart } from 'react-native-gifted-charts';
 
 const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) => {
-    const { usuario } = useContext(AuthContext);
+    const { usuario } = useAuth();
 
     const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
     const PADDING_BOTTOM = React.useMemo(() => 0.0444 * width, [width]);

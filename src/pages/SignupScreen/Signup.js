@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
 import { dynamicStyles } from './styles';
-import { AuthContext } from '../../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 
 const Signup = () => {
     const { width, height } = useWindowDimensions();

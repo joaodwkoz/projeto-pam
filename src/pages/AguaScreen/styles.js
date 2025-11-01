@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
 
-export const dynamicStyles = (width, height) => StyleSheet.create({
+export const dynamicStyles = (width, height, colors, spacing, scale) => StyleSheet.create({
     container: {
         width: '100%',
         flex: 1,
-        backgroundColor: '#F0F4F7',
-        padding: 0.0889 * width,
-        gap: 0.0444 * width,
+        backgroundColor: colors.bg,
+        padding: spacing.app * width,
+        gap: spacing.large * width,
         position: 'relative',
     },
 

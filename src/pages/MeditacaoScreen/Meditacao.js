@@ -9,8 +9,8 @@ import { ReText } from 'react-native-redash';
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../../../contexts/AuthContext';
-import api from '../../../services/api';
+import { AuthContext } from '../../contexts/AuthContext';
+import api from '../../services/api';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';

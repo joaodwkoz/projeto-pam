@@ -1,9 +1,12 @@
 
 import { View, Pressable, Image, Alert, Text, PixelRatio, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+import { useAuth } from '../../hooks/useAuth';
+
+import { BASE_URL_STORAGE } from '../../constants/api';
+
 import { dynamicStyles } from './styles';
 
 const Home = () => {
@@ -11,29 +14,18 @@ const Home = () => {
     
     const styles = dynamicStyles(width, height);
 
-    const [fontsLoaded] = useFonts({
-        'Poppins-M': require('../../../assets/fonts/Poppins-Medium.ttf'),
-        'Poppins-SB': require('../../../assets/fonts/Poppins-SemiBold.ttf'),
-    });
-
     const scale = PixelRatio.get();
 
     const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-    const { usuario, signOut } = useContext(AuthContext);
+    const { usuario, signOut } = useAuth();
 
     const navigation = useNavigation();
 
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `http://192.168.0.8:8000/storage/${usuario.fotoPerfil}` 
+        ? `${BASE_URL_STORAGE}/${usuario.fotoPerfil}` 
         : null;
-
-    if (!fontsLoaded) {
-        return (
-            <ActivityIndicator color='#6C83A1' size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
-        )
-    }
 
     return (
         <View style={styles.container}>

@@ -3,8 +3,8 @@ import { useState, useEffect, useContext, useCallback, useRef, useMemo } from 'r
 import BottomSheet, { BottomSheetModal, BottomSheetTextInput, BottomSheetScrollView, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../../../contexts/AuthContext';
-import api from '../../../services/api';
+import { AuthContext } from '../../contexts/AuthContext';
+import api from '../../services/api';
 import WheelPicker from '@quidone/react-native-wheel-picker';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';

@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { dynamicStyles } from './styles';
-import api from '../../../services/api';
+import api from '../../services/api';
 import { useNavigation } from '@react-navigation/native';
 import debounce from 'lodash.debounce';
 import { useFocusEffect } from '@react-navigation/native';
