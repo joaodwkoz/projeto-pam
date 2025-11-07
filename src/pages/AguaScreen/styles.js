@@ -56,21 +56,6 @@ export const dynamicStyles = (width, height, colors, spacing, scale) => StyleShe
         justifyContent: 'center',
     },
 
-    cupBtns: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-
-    cupBtn: {
-        height: 0.0555 * height,
-        aspectRatio: 1 / 1,
-        backgroundColor: '#6C83A1',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 0.02 * width,
-    },
-
     cups: {
         width: '100%',
     },
@@ -116,74 +101,5 @@ export const dynamicStyles = (width, height, colors, spacing, scale) => StyleShe
 
     modalInput: {
         gap: 0.0222 * width,
-    },
-
-    modalSelect: {
-        gap: 0.0222 * width,
-    },
-
-    select: {
-        width: '100%',
-        height: 0.0444 * height,
-        padding: 0.008 * height,
-        fontFamily: 'Poppins-M',
-        backgroundColor: '#fff',
-        borderColor: '#eee',
-        borderWidth: 0.002 * height,
-        borderRadius: 0.01 * height,
-        color: '#6C83A1',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 100,
-    },
-
-    optionsContainer: {
-        width: '100%',
-        height: 0.175 * height,
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: '115%',
-        padding: 0.0111 * height,
-        backgroundColor: '#fff',
-        borderRadius: 0.01 * height,
-        zIndex: 9999,
-        borderColor: '#eee',
-        borderWidth: 0.002 * height,
-        borderRadius: 0.01 * height,
-        overflow: 'hidden',
-    },
-
-    option: {
-        height: (0.175 * height - 2 * (0.0245 * height)) / 3, 
-        width: '100%',
-        backgroundColor: '#fafafa',
-        borderRadius: 0.01 * height,
-        flexDirection: 'row',
-        gap: 0.0055 * height,
-        alignItems: 'center',
-        paddingLeft: 0.0055 * height,
-    },
-
-    optionIcon: {
-        height: '100%',
-        aspectRatio: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    actions: {
-        width: '100%',
-        height: 0.0555 * height,
-        flexDirection: 'row',
-        gap: 0.0111 * height,
-    },
-
-    actionsBtn: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'red',
-        borderRadius: 0.0075 * height,
     },
 });

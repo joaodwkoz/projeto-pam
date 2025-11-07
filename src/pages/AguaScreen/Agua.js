@@ -10,7 +10,10 @@ import AguaModalHistorico from '../../components/AguaModalHistorico';
 import { useTheme } from '../../hooks/useTheme';
 import ProgressoAgua from '../../components/ProgressoAgua';
 import { BASE_URL_STORAGE } from '../../constants/api';
+
 import Copos from '../../components/Copos';
+
+import { formatDateToYYYYMMDD } from '../../utils/date';
 
 const Agua = () => {
     const { usuario } = useAuth();
@@ -41,130 +44,13 @@ const Agua = () => {
     const [isLoadingConsumos, setIsLoadingConsumos] = useState(true);
 
     useEffect(() => {
-      const loadData = async () => {
-        await Promise.all([
-          fetchConsumedCups()
-        ]);
-      };
-      loadData();
+        fetchConsumedCups();
     }, [fetchConsumedCups]);
-
-    const ICONS = [
-      {
-        nome: 'Xicara',
-        caminho: `${BASE_URL_STORAGE}assets/xicara.png`
-      },
-      {
-        nome: 'Copo',
-        caminho: `${BASE_URL_STORAGE}assets/copo.png`
-      },
-      {
-        nome: 'Garrafa',
-        caminho: `${BASE_URL_STORAGE}assets/garrafa.png`
-      },
-      {
-        nome: 'Garrafa esportiva',
-        caminho: `${BASE_URL_STORAGE}assets/garrafaesportiva.png`
-      },
-      {
-        nome: 'Garrafão',
-        caminho: `${BASE_URL_STORAGE}assets/garrafao.png`
-      },
-      {
-        nome: 'Jarra',
-        caminho: `${BASE_URL_STORAGE}assets/jarra.png`
-      },
-      {
-        nome: 'Galão',
-        caminho: `${BASE_URL_STORAGE}assets/galao.png`
-      },
-    ]
-
-    const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [modalState, setModalState] = useState('Create');
-    const [nome, setNome] = useState("");
-    const [capacidade, setCapacidade] = useState("");
-    const [iconeEscolhido, setIconeEscolhido] = useState(-1);
-    const [copo, setCopo] = useState(-1);
-
-    const clearModal = () => {
-      setModalVisible(false);
-      setModalState('Create');
-      setNome("");
-      setCapacidade("");
-      setIconeEscolhido(-1);
-      setCopo(-1);
-    }
-
-    const handleSaveCup = async () => {
-      const dados = {
-        'nome': nome,
-        'capacidade_ml': Number(capacidade),
-        'icone_id': iconeEscolhido + 1,
-        'usuario_id': usuario.id
-      }
-
-      try {
-        const res = await api.post('/copo', dados);
-        setCopos(prevCopos => [...prevCopos, res.data]);
-      } catch(e) {
-        console.error('Ocorreu um erro ao salvar o copo', e);
-      } finally {
-        clearModal();
-      }
-    }
-
-    const handleOpenUpdateModal = (nome, capacidade, iconeId) => {
-      setModalState('Update');
-      setNome(nome);
-      setCapacidade(String(capacidade));
-      setIconeEscolhido(iconeId - 1);
-      setModalVisible(true)
-    }
-
-    const handleUpdateCup = async () => {
-      const dados = {
-        'nome': nome,
-        'capacidade_ml': Number(capacidade),
-        'icone_id': iconeEscolhido + 1,
-        'usuario_id': usuario.id
-      }
-
-      try {
-        const res = await api.put(`/copos/${copo}`, dados);
-        const copoAtualizado = res.data;
-        setCopos(prevCopos =>
-          prevCopos.map(c => 
-            c.id === copoAtualizado.id
-              ? copoAtualizado
-              : c
-          )
-        );
-      } catch(e) {
-        console.error('Ocorreu um erro ao atualizar o copo', e);
-      } finally {
-        clearModal();
-      }
-    }
-
-    const handleDeleteCup = async () => {
-      try {
-        await api.delete(`/copos/${copo}`);
-        setCopos(prevCopos =>
-          prevCopos.filter(c => c.id !== copo)
-        );
-      } catch(e) {
-        console.error('Ocorreu um erro ao remover o copo', e);
-      } finally {
-        clearModal();
-      }
-    }
 
     const [historicoModalVisible, setHistoricoModalVisible] = useState(false);
 
     if (isLoadingConsumos) {
-      return <ActivityIndicator color='#6C83A1' size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
+        return <ActivityIndicator color='#6C83A1' size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
     }
 
     return (
@@ -218,21 +104,9 @@ const Agua = () => {
 
             <ProgressoAgua width={width} height={height} theme={theme} total={totalMl} meta={META_ML} />
 
-            <View style={styles.cupBtns}>
-                <Pressable style={styles.cupBtn} onPress={() => setHistoricoModalVisible(true)}>
-                <Octicons name="graph" size={24} color="#fff" />
-                </Pressable>
+            <Copos setTotal={setTotalMl} onOpenHistory={() => setHistoricoModalVisible(true)}></Copos>
 
-                <Pressable style={styles.cupBtn} onPress={()=> setModalVisible(true)}>
-                <Entypo name="plus" size={24} color="#fff" />
-                </Pressable>
-            </View>
-
-            <Copos setTotal={setTotalMl}></Copos>
-
-            
-
-            <AguaModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} width={width} height={height} scale={scale}></AguaModalHistorico>
+            <AguaModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible}></AguaModalHistorico>
         </View>
     )
 }

@@ -58,7 +58,7 @@ const dynamicStyles = (width, height, colors, fonts, spacing, scale) => StyleShe
     capacityText: {
         fontFamily: fonts.medium,
         fontSize: 6 * scale,
-        color: colors.text.app,
+        color: colors.text.primary,
         lineHeight: 6.6 * scale,
     },
 });

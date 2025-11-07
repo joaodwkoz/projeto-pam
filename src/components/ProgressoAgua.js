@@ -92,7 +92,7 @@ const dynamicStyles = (width, colors, fonts, scale) => StyleSheet.create({
     progressText: {
         fontFamily: fonts.medium,
         fontSize: 25 * scale,
-        color: colors.text.app,
+        color: colors.text.primary,
         lineHeight: 30.5 * scale,
     },
 });

@@ -5,12 +5,15 @@ export const colors = {
     secondary: '#607DA3',
     bg: '#F0F4F7',
     text: {
-        app: '#6C83A1',
+        primary: '#6C83A1',
         secondary: '#799BC8',
     },
     white: '#fff',
+    secondaryWhite: '#f0f0f0',
+    border: '#eee',
     lightblue: '#b9cadf',
-    surface: '#fafafa'
+    surface: '#fafafa',
+    danger: '#cf5555d3',
 };
 
 export const fonts = {
