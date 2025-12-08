@@ -1,4 +1,4 @@
-const IP = '192.168.0.7';
+const IP = '10.170.140.122';
 const PORT = 8000;
 
 export const BASE_URL_STORAGE = `http://${IP}:${PORT}/`;

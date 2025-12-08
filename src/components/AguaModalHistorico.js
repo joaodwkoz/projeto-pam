@@ -7,6 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 
 import api from "../services/api";
+import { BASE_URL_STORAGE } from "../constants/api";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -41,8 +42,6 @@ const AguaModalHistorico = ({ visible, setVisible }) => {
     const [history, setHistory] = useState(null);
     const [lineData, setLineData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
-    const BASE_URL_STORAGE = 'http://192.168.0.7:8000/';
 
     const fetchHistory = useCallback(async () => {
         setIsLoading(true);
