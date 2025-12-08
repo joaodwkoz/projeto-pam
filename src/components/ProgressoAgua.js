@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import Animated, {
   useSharedValue,
   withTiming,
@@ -8,6 +8,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Stop, Circle } from 'react-native-svg';
 import { ReText } from 'react-native-redash';
+
+import { sendNotification } from '../services/notificationService'; 
 
 const ProgressoAgua = ({ width, height, theme, total, meta }) => {
     const { colors, fonts, scale } = theme;
@@ -21,11 +23,12 @@ const ProgressoAgua = ({ width, height, theme, total, meta }) => {
 
     const progress = useSharedValue(0);
     const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
     const animatedProps = useAnimatedProps(() => {
         const dashOffset = CIRCLE_LENGTH * (1 - progress.value);
 
         return {
-            strokeDashoffset: Math.max(dashOffset, 0), 
+            strokeDashoffset: Math.max(dashOffset, 0),
         };
     });
 
@@ -33,10 +36,27 @@ const ProgressoAgua = ({ width, height, theme, total, meta }) => {
         return `${Math.floor(progress.value * 100)}%`;
     });
 
+    const notified = useRef(false);
+
     useEffect(() => {
-        const newProgress = total / meta; 
-        const clampedProgress = Math.min(newProgress, 1); 
-        progress.value = withTiming(clampedProgress, { duration: 800 }); 
+        const newProgress = total / meta;
+        const clampedProgress = Math.min(newProgress, 1);
+
+        progress.value = withTiming(clampedProgress, { duration: 800 });
+
+        
+        if (clampedProgress >= 1 && !notified.current) {
+            sendNotification(
+                "Meta de água atingida! 💧",
+                "Parabéns! Você completou 100% da sua meta diária."
+            );
+            notified.current = true;
+        }
+
+        if (clampedProgress < 1) {
+            notified.current = false; 
+        }
+
     }, [total, meta]);
 
     return (
@@ -77,7 +97,7 @@ const ProgressoAgua = ({ width, height, theme, total, meta }) => {
 
             <ReText style={styles.progressText} text={progressText} />
         </View>
-    )
+    );
 };
 
 const dynamicStyles = (width, colors, fonts, scale) => StyleSheet.create({

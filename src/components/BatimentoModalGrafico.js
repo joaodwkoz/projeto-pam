@@ -1,22 +1,18 @@
 import { BlurView } from "expo-blur";
-import React, { useEffect, useState, useCallback, useContext } from "react";
-import { View, Image, Pressable, Modal, StyleSheet, Text, SectionList, ActivityIndicator } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolate,
-} from "react-native-reanimated";
+import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
+import { View, Pressable, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from "../hooks/useAuth";
 import api from "../services/api";
 import { LineChart } from 'react-native-gifted-charts';
+import * as Notifications from 'expo-notifications';
 
 const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const { usuario } = useAuth();
-
-    const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
-    const PADDING_BOTTOM = React.useMemo(() => 0.0444 * width, [width]);
+    const [periodo, setPeriodo] = useState('7d');
+    const [lineData, setLineData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const notifiedRef = useRef(false); 
 
     const MODAL_VIEW_WIDTH = 0.82 * width;
     const MODAL_PADDING = 0.0444 * width;
@@ -24,10 +20,13 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
 
     const styles = React.useMemo(() => dynamicStyles(width, height), [width, height]);
 
-    const [periodo, setPeriodo] = useState('7d');
-
-    const [lineData, setLineData] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    // Função para enviar notificação
+    const sendNotification = async (title, body) => {
+        await Notifications.scheduleNotificationAsync({
+            content: { title, body },
+            trigger: null,
+        });
+    };
 
     const fetchChart = useCallback(async () => {
         setIsLoading(true);
@@ -35,7 +34,21 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
         try {
             const res = await api.get(`/usuario/${usuario.id}/batimentos-grafico?periodo=${periodo}`); 
             setLineData(res.data.dados_grafico);
-            console.log(res.data.dados_grafico);
+
+          
+            if (res.data.dados_grafico && res.data.dados_grafico.length > 0) {
+                const lastValue = res.data.dados_grafico[res.data.dados_grafico.length - 1].value;
+
+                let mensagem = '';
+                if (lastValue < 50) mensagem = `Seu batimento está muito baixo: ${lastValue} bpm`;
+                else if (lastValue > 100) mensagem = `Seu batimento está alto: ${lastValue} bpm`;
+
+                if (mensagem && !notifiedRef.current) {
+                    sendNotification("Alerta de Batimento", mensagem);
+                    notifiedRef.current = true; 
+                }
+            }
+
         } catch(e) {
             console.error('Ocorreu um erro!', e);
         } finally {
@@ -46,6 +59,7 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
     useEffect(() => {
         if (visible) { 
             fetchChart();
+            notifiedRef.current = false;
         }
     }, [visible, fetchChart]);
 
@@ -71,63 +85,34 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
                             </View>
 
                             <View style={styles.modalBody}>
+                                {/* Filtros de período */}
                                 <View style={styles.periodFilters}>
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === '24h' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('24h')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === '24h' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            24h
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === '7d' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('7d')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === '7d' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            7d
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === '30d' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('30d')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === '30d' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            30d
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === '365d' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('365d')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === '365d' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            365d
-                                        </Text>
-                                    </Pressable>
+                                    {['24h', '7d', '30d', '365d'].map(p => (
+                                        <Pressable
+                                            key={p}
+                                            style={[styles.filter, { backgroundColor: periodo === p ? '#6C83A1' : '#f0f0f0' }]}
+                                            onPress={() => setPeriodo(p)}
+                                        >
+                                            <Text style={{
+                                                fontFamily: 'Poppins-M',
+                                                fontSize: 6 * scale,
+                                                color: periodo === p ? '#fff' : '#6C83A1',
+                                                lineHeight: 9 * scale
+                                            }}>{p}</Text>
+                                        </Pressable>
+                                    ))}
                                 </View>
 
+                                {/* Gráfico */}
                                 <View style={styles.modalContent}>
                                     {
                                         lineData && lineData.length > 0 ? ( 
-                                            <View
-                                                style={{
-                                                    width: '100%',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    overflow: 'hidden',
-                                                }}
-                                                >
+                                            <View style={{
+                                                width: '100%',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                overflow: 'hidden',
+                                            }}>
                                                 <LineChart
                                                     data={lineData}
                                                     areaChart
@@ -195,104 +180,5 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
         </Modal>
     );
 };
-
-const dynamicStyles = (width, height) => StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    modal: {
-        width: '82%',
-        backgroundColor: '#fff',
-        borderRadius: 0.025 * width,
-        padding: 0.0444 * width,
-        gap: 0.0222 * width,
-    },
-
-    modalHeader: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-
-    modalBody: {
-        gap: 0.0222 * width,
-    },
-
-    closeModalBtn: {
-        height: 0.04 * height,
-        aspectRatio: 1 / 1,
-        borderRadius: 0.0125 * width,
-        backgroundColor: '#f0f0f0',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    periodFilters: {
-        width: '100%',
-        flexDirection: 'row',
-        gap: 0.0222 * width,
-    },
-
-    filter: {
-        padding: 0.0222 * width,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 0.0125 * width,
-    },
-
-    tabSwitch: {
-        width: 'auto',
-        height: 0.05 * height,
-        backgroundColor: '#fafafa',
-        flexDirection: 'row',
-        borderRadius: 0.0125 * width,
-        padding: 0.015 * width,
-        gap: 0.015 * width,
-        position: 'relative',
-    },
-
-    tab: {
-        height: '100%',
-        width: 0.2 * width,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 2,
-    },
-
-    tabSwitchWrapper: {
-        position: 'absolute',
-        top: 0.015 * width,
-        left: 0.015 * width,
-        width: 0.2 * width,
-        height: '100%',
-        backgroundColor: '#fff',
-        zIndex: 1,
-        borderRadius: 0.0125 * width,
-    },
-
-    modalContent: {
-        maxHeight: 0.3 * height,
-        width: '100%',
-    },
-
-    historyItem: {
-        width: '100%',
-        height: 0.025 * height,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width,
-    },
-
-    historyItemInfo: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    }
-});
 
 export default BatimentoModalGrafico;
