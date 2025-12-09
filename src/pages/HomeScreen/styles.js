@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-export const dynamicStyles = (width, height) => StyleSheet.create({
+export const dynamicStyles = (width, height) =>
+StyleSheet.create({
     container: {
         width: '100%',
         flex: 1,
@@ -8,7 +9,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         padding: 0.0889 * width,
         gap: 0.0444 * width,
     },
-    
+
     header: {
         height: 0.1151 * height,
         backgroundColor: '#fff',
@@ -20,7 +21,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: '100%',
         flexDirection: 'row',
         gap: 0.0222 * width,
-        position: 'relative'
+        position: 'relative',
     },
 
     userImg: {
@@ -57,6 +58,10 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center',
     },
 
+    notifications: {
+        // placeholder pra futuros ícones/sino
+    },
+
     apps: {
         gap: 0.0444 * width,
     },
@@ -65,33 +70,39 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
     },
-    
+
     appsContainer: {
         width: '100%',
         flexDirection: 'row',
-        gap: 0.0889 * width,
+        flexWrap: 'wrap',
+        gap: 0.0222 * width,
     },
 
-    mainApp: {
-        width: 0.3806 * width,
-        height: 0.1637 * height,
+    // 3 por linha, considerando padding do container e gap entre eles
+    appSquare: {
+        width:
+            (width -
+                0.0889 * 2 * width - // padding horizontal total
+                0.0222 * 2 * width) / // 2 gaps entre 3 itens
+            3,
+        height: 0.09 * height,
         backgroundColor: '#fff',
-        borderRadius: 0.0444 * width,
+        borderRadius: 0.0333 * width,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
 
-    otherApps: {
-        gap: 0.0889 * width,
+    targets: {
+        gap: 0.0222 * width,
     },
 
-    app: {
-        width: 0.3528 * width,
-        height: 0.0614 * height,
-        backgroundColor: '#fff',
-        borderRadius: 0.0333 * width
+    targetsHeader: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
 
     navbar: {

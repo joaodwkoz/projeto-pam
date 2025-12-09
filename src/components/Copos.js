@@ -47,10 +47,10 @@ const Copos = ({setTotal, onOpenHistory}) => {
     }
 
     const handleSaveCup = async (dados) => {
-        const dados = {...dados, 'usuario_id': usuario.id};
+        const dadosNew = {...dados, 'usuario_id': usuario.id};
 
         try {
-            const res = await api.post('/copo', dados);
+            const res = await api.post('/copo', dadosNew);
             setCopos(prevCopos => [...prevCopos, res.data]);
         } catch(e) {
             console.error('Ocorreu um erro ao salvar o copo', e);
@@ -58,10 +58,10 @@ const Copos = ({setTotal, onOpenHistory}) => {
     }
 
     const handleUpdateCup = async (dados) => {
-        const dados = {...dados, 'usuario_id': usuario.id};
+        const dadosNew = {...dados, 'usuario_id': usuario.id};
 
         try {
-            const res = await api.put(`/copos/${copoSelecionado.id}`, dados);
+            const res = await api.put(`/copos/${copoSelecionado.id}`, dadosNew);
             const copoAtualizado = res.data;
             setCopos(prevCopos =>
             prevCopos.map(c => 

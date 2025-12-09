@@ -1,96 +1,223 @@
-import { View, Pressable, Image, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView } from 'react-native';
-import Animated, {
-  useSharedValue,
-  withTiming,
-  useAnimatedProps,
-  useDerivedValue
-} from 'react-native-reanimated';
-import { ReText } from 'react-native-redash';
-import { useState, useEffect, useContext, useCallback } from 'react';
-import { useFonts } from 'expo-font';
+import {
+    View,
+    Pressable,
+    Image,
+    Text,
+    PixelRatio,
+    useWindowDimensions,
+} from 'react-native';
+import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../../contexts/AuthContext';
-import api from '../../services/api';
+import { useFonts } from 'expo-font';
+import { useAuth } from '../../hooks/useAuth';
 
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Entypo from '@expo/vector-icons/Entypo';
+import { BASE_URL_STORAGE } from '../../constants/api';
 import { dynamicStyles } from './styles';
 
-
-const Meditacao = () => {
+const Home = () => {
     const { width, height } = useWindowDimensions();
-    
     const styles = dynamicStyles(width, height);
+    const scale = PixelRatio.get();
+
+    const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
+    const { usuario, signOut } = useAuth();
+
+    const navigation = useNavigation();
+
+    const data = new Date();
+
+    const imagemPerfilUrl = usuario?.fotoPerfil
+        ? `${BASE_URL_STORAGE}/${usuario.fotoPerfil}`
+        : null;
 
     const [fontsLoaded] = useFonts({
         'Poppins-M': require('../../../assets/fonts/Poppins-Medium.ttf'),
         'Poppins-SB': require('../../../assets/fonts/Poppins-SemiBold.ttf'),
     });
 
-    const scale = PixelRatio.get();
-
-    const navigation = useNavigation();
-
-    const { usuario } = useContext(AuthContext);
+    if (!fontsLoaded) return null;
 
     return (
         <View style={styles.container}>
+            {/* HEADER */}
             <View style={styles.header}>
-                <Pressable style={styles.headerBtn} onPress={() => navigation.navigate('Home')}>
-                    <FontAwesome5 name="backward" size={0.0444 * width} color="#97B9E5" />
-                </Pressable>
+                <View style={styles.user}>
+                    <Pressable
+                        style={styles.userImg}
+                        onPress={() => setMostrarOpcoes(!mostrarOpcoes)}
+                    >
+                        <Image
+                            source={
+                                imagemPerfilUrl
+                                    ? { uri: imagemPerfilUrl }
+                                    : require('../../../assets/imgs/user-icon.png')
+                            }
+                            style={{
+                                height: '100%',
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                                borderRadius: 9999,
+                            }}
+                        />
+                    </Pressable>
 
-                <Pressable style={styles.headerBtn}>
-                    <Ionicons name="settings-sharp" size={0.0444 * width} color="#97B9E5" />
-                </Pressable>
-            </View>
-
-            <Text style={{
-                fontFamily: 'Poppins-M',
-                fontSize: 13 * scale,
-                color: '#6C83A1',
-                lineHeight: 17 * scale
-            }}>Meditação</Text>
-
-            <View style={styles.history}>
-                <Text style={{
-                    fontFamily: 'Poppins-M',
-                    fontSize: 8 * scale,
-                    color: '#6C83A1',
-                    lineHeight: 10 * scale
-                }}>
-                    Histórico
-                </Text>
-
-                <View style={styles.historyCard}>
-                    <View style={styles.historyCardInfo}>
-                        <Text style={{
-                            fontFamily: 'Poppins-M',
-                            fontSize: 7 * scale,
-                            color: '#6C83A1',
-                            lineHeight: 10 * scale
-                        }}>
-                            Últimas sessões
+                    <View style={styles.userInfo}>
+                        <Text
+                            style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 8 * scale,
+                                color: '#475C7C',
+                            }}
+                        >
+                            Olá, {usuario?.name}!
                         </Text>
 
-                        <Text style={{
-                            fontFamily: 'Poppins-M',
-                            fontSize: 5 * scale,
-                            color: '#6C83A1',
-                            lineHeight: 9 * scale
-                        }}>
-                            Desfrute de sensações passadas com as últimas sessões
+                        <Text
+                            style={{
+                                width: '100%',
+                                fontFamily: 'Poppins-M',
+                                fontSize: 4.5 * scale,
+                                color: '#6A84AA',
+                            }}
+                        >
+                            {data.getDate()} de{' '}
+                            {
+                                [
+                                    'janeiro',
+                                    'fevereiro',
+                                    'março',
+                                    'abril',
+                                    'maio',
+                                    'junho',
+                                    'julho',
+                                    'agosto',
+                                    'setembro',
+                                    'outubro',
+                                    'novembro',
+                                    'dezembro',
+                                ][data.getMonth()]
+                            }{' '}
+                            de 2025
                         </Text>
-                    </View>
-
-                    <View style={styles.historyCardBtn}>
-                        <Ionicons name="play" size={width * 0.075} color="#fff" />
                     </View>
                 </View>
+
+                <View style={styles.notifications} />
+            </View>
+
+            {mostrarOpcoes && (
+                <View style={styles.userImgOptions}>
+                    <Pressable
+                        style={styles.userImgOption}
+                        onPress={() => navigation.navigate('Profile')}
+                    >
+                        <Text
+                            style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 5 * scale,
+                                color: '#dadada',
+                            }}
+                        >
+                            Editar perfil
+                        </Text>
+                    </Pressable>
+
+                    <Pressable style={styles.userImgOption} onPress={signOut}>
+                        <Text
+                            style={{
+                                fontFamily: 'Poppins-M',
+                                fontSize: 5 * scale,
+                                color: '#dadada',
+                            }}
+                        >
+                            Sair
+                        </Text>
+                    </Pressable>
+                </View>
+            )}
+
+            {/* APPS */}
+            <View style={styles.apps}>
+                <View style={styles.appsHeader}>
+                    <Text
+                        style={{
+                            width: '60%',
+                            fontFamily: 'Poppins-M',
+                            fontSize: 13 * scale,
+                            color: '#6C83A1',
+                            flexShrink: 1,
+                        }}
+                    >
+                        Aplicações
+                    </Text>
+                </View>
+
+                <View style={styles.appsContainer}>
+                    {/* Linha 1 */}
+                    <Pressable
+                        style={styles.appSquare}
+                        onPress={() => navigation.navigate('Calorias')}
+                    >
+                        <Image
+                            source={require('../../../assets/imgs/calorias.png')}
+                            style={{
+                                height: '60%',
+                                aspectRatio: 1 / 1,
+                                objectFit: 'contain',
+                            }}
+                        />
+                    </Pressable>
+
+                    <Pressable
+                        style={styles.appSquare}
+                        onPress={() => navigation.navigate('Agua')}
+                    />
+
+                    <Pressable
+                        style={styles.appSquare}
+                        onPress={() => navigation.navigate('Meditacao')}
+                    />
+
+                    {/* Linha 2 */}
+                    <Pressable style={styles.appSquare} />
+                    <Pressable style={styles.appSquare} />
+                    <Pressable style={styles.appSquare} />
+
+                    {/* Linha 3 */}
+                    <Pressable style={styles.appSquare} />
+                    <Pressable style={styles.appSquare} />
+                    <Pressable style={styles.appSquare} />
+                </View>
+            </View>
+
+            {/* METAS */}
+            <View style={styles.targets}>
+                <View style={styles.targetsHeader}>
+                    <Text
+                        style={{
+                            fontFamily: 'Poppins-M',
+                            fontSize: 13 * scale,
+                            color: '#6C83A1',
+                            flexShrink: 1,
+                        }}
+                    >
+                        Metas do dia
+                    </Text>
+                </View>
+            </View>
+
+            {/* NAVBAR */}
+            <View style={styles.navbar}>
+                <View style={styles.navbarAppSelected} />
+
+                <View style={styles.navbarApp} />
+
+                <View style={styles.navbarApp} />
+
+                <View style={styles.navbarApp} />
             </View>
         </View>
-    )
-}
+    );
+};
 
-export default Meditacao;
+export default Home;
