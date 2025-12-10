@@ -5,9 +5,6 @@ import WheelPicker from '@quidone/react-native-wheel-picker';
 
 import { dynamicStyles } from '../pages/GlicemiaScreen/styles';
 
-
-import { scheduleNotification } from '../services/notificationService';
-
 const GlicemiaModal = React.memo(({
     visible,
     fecharModal,

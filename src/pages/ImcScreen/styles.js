@@ -64,4 +64,26 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    modalBackdrop: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    helpModal: {
+        width: '82%',
+        maxHeight: '60%',
+        backgroundColor: '#fefefe',
+        borderRadius: 0.025 * height,
+        padding: 0.0444 * width,
+        alignItems: 'center',
+        gap: 0.0222 * height, 
+    },
+
+    helpSection: {
+        width: '100%',
+        gap: 0.01 * height,
+    },
 });

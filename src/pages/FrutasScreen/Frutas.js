@@ -14,10 +14,12 @@ import {
     useWindowDimensions,
     ActivityIndicator,
     ScrollView,
+    Modal // Adicionado
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
+import { BlurView } from 'expo-blur'; // Adicionado
 import axios from 'axios';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -125,6 +127,9 @@ const Frutas = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [fruitOfDay, setFruitOfDay] = useState(null);
     const [selectedFruit, setSelectedFruit] = useState(null);
+
+    // Estado do Modal de Ajuda
+    const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const bottomSheetRef = useRef(null);
     const [sheetIndex, setSheetIndex] = useState(-1);
@@ -297,10 +302,10 @@ const Frutas = () => {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.headerBtn}>
+                    <Pressable style={styles.headerBtn} onPress={() => setMostrarModalAjuda(true)}>
                         <Ionicons
-                            name="settings-sharp"
-                            size={0.0444 * width}
+                            name="help-circle"
+                            size={0.05 * width}
                             color="#97B9E5"
                         />
                     </Pressable>
@@ -627,6 +632,98 @@ const Frutas = () => {
                     )}
                 </BottomSheetView>
             </BottomSheetModal>
+
+            {/* Modal de Ajuda */}
+            <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
+                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
+                    <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
+                        <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
+                            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+                            </View>
+
+                            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
+                                <View style={styles.helpSection}>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-SB',
+                                        fontSize: 9 * scale,
+                                        color: '#6C83A1',
+                                    }}>Frutas</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Função:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Mostrar informações nutricionais de frutas (via API).</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Campos:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Nome, calorias, nutrientes, benefícios.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Como usar:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Pesquise ou escolha uma fruta.</Text>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>O app busca dados e mostra tudo na tela.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Resultado esperado:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Informações completas da fruta + dicas de consumo.</Text>
+                                </View>
+                            </ScrollView>
+                        </Pressable>
+                    </Pressable>
+                </BlurView>
+            </Modal>
         </BottomSheetModalProvider>
     );
 };

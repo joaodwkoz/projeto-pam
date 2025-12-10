@@ -41,13 +41,13 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         alignItems: 'center'
     },
 
-    myAllergies: {
+    myRemedies: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
 
-    addAllergy: {
+    addRemedy: {
         height: 0.04 * height,
         width: '35%',
         backgroundColor: '#6C83A1',
@@ -56,7 +56,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center'
     },
 
-    allergy: {
+    remedy: {
         width: '100%',
         height: 0.1 * height,
         backgroundColor: '#fff',
@@ -67,35 +67,29 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         padding: 0.0444 * width,
     },
 
-    allergyInfo: {
+    remedyInfo: {
         flexDirection: 'row',
-        gap: 0.0444 * width,
+        gap: 0.03 * width,
         alignItems: 'center',
         flex: 1
     },
 
-    reactions: {
-        width: '100%',
-        height: 0.05 * height,
-        gap: 0.0444 * width,
-        flexDirection: 'row',
-    },
-
-    reactionsBtns: {
-        flex: 1,
-        backgroundColor: '#fff',
+    iconContainer: {
+        width: width * 0.11,
+        height: width * 0.11,
+        borderRadius: width * 0.03,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 0.0125 * height,
     },
 
-    allergyModalContainer: {
+    remedyModalContainer: {
         width: '100%',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
 
+    // Backdrop Clicável
     modalBackdrop: {
         flex: 1,
         width: '100%',
@@ -103,7 +97,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center',
     },
 
-    allergyModal: {
+    remedyModal: {
         width: '82%',
         backgroundColor: '#fefefe',
         borderRadius: 0.025 * height,
@@ -111,8 +105,10 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * height,
     },
 
-    allergyModalInput: {
-        gap: 0.0222 * height,
+    remedyModalInput: {
+        gap: 0.01 * height,
+        position: 'relative',
+        zIndex: 10
     },
 
     textInputStyle: {
@@ -129,7 +125,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         color: '#6C83A1',
     },
 
-    allergyModalSelect: {
+    remedyModalSelect: {
         width: '100%',
         height: 0.0444 * height,
         padding: 0.008 * height,
@@ -141,98 +137,48 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         color: '#6C83A1',
         justifyContent: 'center',
         position: 'relative',
-        zIndex: 110,
     },
 
-    allergyModalOptionsContainer: {
+    remedyModalOptionsContainer: {
         position: 'absolute',
-        top: '115%',
+        top: '105%', 
+        left: 0,
         width: '100%',
-        height: 0.15 * height,
+        height: 0.25 * height,
         padding: 0.0222 * width,
         backgroundColor: '#fff',
-        borderRadius: 0.025 * width,
-        zIndex: 110,
         borderColor: '#eee',
         borderWidth: 0.002 * height,
         borderRadius: 0.01 * height,
-        overflow: 'hidden',
+        zIndex: 100, 
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
     },
 
-    allergyModalOption: {
+    remedyModalOption: {
         width: '100%',
-        height: (0.15 * height - 0.0888 * width) / 3,
+        height: 0.06 * height,
         backgroundColor: '#fafafa',
         borderRadius: 0.0125 * width,
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 0.0111 * width,
-        gap: 0.0111 * width,
-    },
-
-    allergyModalRadioBtns: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-
-    allergyModalRadioBtn: {
-        flexDirection: 'row',
+        paddingHorizontal: 0.0222 * width,
         gap: 0.0222 * width,
-        alignItems: 'center'
+        marginBottom: 0.005 * height
     },
 
-    circle: {
-        width: 0.05 * width,
-        aspectRatio: 1,
-        borderRadius: 9999,
-        borderWidth: 0.005 * width,
-        borderColor: '#000',
-    },
-
-    allergyModalChipInput: {
-        width: '100%',
-        height: 0.0444 * height,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 100,
-        flexDirection: 'row',
-        gap: 0.0222 * width,
-    },
-
-    allergyModalAddReactionBtn: {
-        height: '100%',
-        aspectRatio: 1,
-        backgroundColor: '#6C83A1',
-        borderRadius: 0.0125 * width,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    allergyModalReactionsContainer: {
-        width: '100%',
-        maxHeight: 0.15 * height,
-    },
-
-    allergyModalReaction: {
-        width: '100%',
-        height: (0.15 * height - 0.0444 * width) / 3,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#f0f0f0',
-        borderRadius: 0.0075 * width,
-        padding: 0.0222 * width,
-    },
-
-    allergyModalActions: {
+    remedyModalActions: {
         width: '100%',
         height: 0.05 * height,
         flexDirection: 'row',
         gap: 0.0222 * width,
+        marginTop: 0.01 * height
     },
 
-    allergyModalBtn: {
+    remedyModalBtn: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
@@ -242,7 +188,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
 
     helpModal: {
         width: '82%',
-        maxHeight: '60%',
         backgroundColor: '#fefefe',
         borderRadius: 0.025 * height,
         padding: 0.0444 * width,

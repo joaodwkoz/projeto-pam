@@ -1,4 +1,4 @@
-import { View, Pressable, Alert, Image, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView } from 'react-native';
+import { View, Pressable, Alert, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView } from 'react-native';
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import { BlurView } from 'expo-blur';
@@ -15,13 +15,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Octicons from '@expo/vector-icons/Octicons';
 
 import { dynamicStyles } from './styles';
-
-function formatDateToYYYYMMDD(dateObj) {
-  const year = dateObj.getFullYear();
-  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const day = String(dateObj.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
 const Alergias = () => {
     const { width, height } = useWindowDimensions();
@@ -40,58 +33,16 @@ const Alergias = () => {
     const { usuario } = useContext(AuthContext);
 
     const CATEGORIAS = [
-        {
-            icon: {
-                lib: MaterialCommunityIcons,
-                nome: 'food-drumstick'
-            },
-            nome: 'Alimentar',
-            cor: '#a8d8ff',
-        },
-        {
-            icon: {
-                lib: FontAwesome5,
-                nome: 'lungs'
-            },
-            nome: 'Respiratória',
-            cor: '#b0e3c7',
-        },
-        {
-            icon: {
-                lib: FontAwesome5,
-                nome: 'briefcase-medical'
-            },
-            nome: 'Medicamentosa',
-            cor: '#f4978e',
-        },
-        {
-            icon: {
-                lib: MaterialCommunityIcons,
-                nome: 'hand-wash'
-            },
-            nome: 'Contato',
-            cor: '#cea8ff',
-        },
-        {
-            icon: {
-                lib: FontAwesome6,
-                nome: 'spider'
-            },
-            nome: 'Insetos',
-            cor: '#000',
-        },
-
-        {
-            icon: {
-                lib: Entypo,
-                nome: 'help'
-            },
-            nome: 'Outros',
-            cor: '#dedede',
-        },
+        { icon: { lib: MaterialCommunityIcons, nome: 'food-drumstick' }, nome: 'Alimentar', cor: '#a8d8ff' },
+        { icon: { lib: FontAwesome5, nome: 'lungs' }, nome: 'Respiratória', cor: '#b0e3c7' },
+        { icon: { lib: FontAwesome5, nome: 'briefcase-medical' }, nome: 'Medicamentosa', cor: '#f4978e' },
+        { icon: { lib: MaterialCommunityIcons, nome: 'hand-wash' }, nome: 'Contato', cor: '#cea8ff' },
+        { icon: { lib: FontAwesome6, nome: 'spider' }, nome: 'Insetos', cor: '#000' },
+        { icon: { lib: Entypo, nome: 'help' }, nome: 'Outros', cor: '#dedede' },
     ]
 
     const [mostrarModal, setMostrarModal] = useState(false);
+    const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
     const [modalState, setModalState] = useState('Create');
     
     const abrirModal = () => setMostrarModal(true);
@@ -99,23 +50,24 @@ const Alergias = () => {
     const fecharModal = () => {
         setMostrarModal(false);
         setModalState('Create');
-        setNome();
+        setNome('');
         setCategoriaEscolhida(-1);
         setMostrarCategorias(false);
         setGravidade();
         setReacoes([]);
-        setReacao();
-        setDescricao();
+        setReacao('');
+        setDescricao('');
+        setAlergia({}); 
     }
 
-    const [alergia, setAlergia] = useState({});
-    const [nome, setNome] = useState();
+    const [alergia, setAlergia] = useState({}); 
+    const [nome, setNome] = useState('');
     const [categoriaEscolhida, setCategoriaEscolhida] = useState(-1);
     const [mostrarCategorias, setMostrarCategorias] = useState(false);
     const [gravidade, setGravidade] = useState();
     const [reacoes, setReacoes] = useState([]);
-    const [reacao, setReacao] = useState();
-    const [descricao, setDescricao] = useState();
+    const [reacao, setReacao] = useState('');
+    const [descricao, setDescricao] = useState('');
     const [alergias, setAlergias] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -125,7 +77,7 @@ const Alergias = () => {
           const res = await api.get(`/usuario/${usuario.id}/alergias`);
           setAlergias(res.data); 
         } catch (e) {
-          console.error("Erro ao buscar alergias do usuário:", e);
+          console.error("Erro ao buscar alergias:", e);
         } finally {
           setIsLoading(false);
         }
@@ -139,40 +91,54 @@ const Alergias = () => {
             descricao: descricao,
             reacoes: reacoes
         };
-    
         setIsSaving(true);
-    
         try {
             const res = await api.put(`/alergias/${alergia}`, dadosAlergia); 
             const ale = res.data;
-            
-            setAlergias(prev =>
-                prev.map(a => 
-                    a.id === ale.id
-                        ? ale
-                        : a
-                )
-            );
+            setAlergias(prev => prev.map(a => a.id === ale.id ? ale : a));
         } catch(e) {
-            console.error('Ocorreu um erro ao atualizar a alergia', e);
+            Alert.alert("Erro", "Não foi possível atualizar a alergia.");
         } finally {
             setIsSaving(false);
             fecharModal();
         }
     }, [alergia, nome, categoriaEscolhida, gravidade, descricao, reacoes, fecharModal]);
 
+    const handleDeleteAlergia = async () => {
+        Alert.alert(
+            "Excluir Alergia",
+            "Tem certeza que deseja excluir este registro?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: async () => {
+                        setIsSaving(true);
+                        try {
+                            await api.delete(`/alergias/${alergia}`);
+                            setAlergias(prev => prev.filter(item => item.id !== alergia));
+                            fecharModal();
+                        } catch (e) {
+                            Alert.alert("Erro", "Não foi possível excluir a alergia.");
+                        } finally {
+                            setIsSaving(false);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
     const handleOpenUpdateModal = useCallback((alergiaClicada) => {
         const categoriaIndex = CATEGORIAS.findIndex(c => c.nome === alergiaClicada.categoria);
-        const reacoesNomes = alergiaClicada.reacoes.map(r => r.nome);
-    
+        const reacoesNomes = alergiaClicada.reacoes ? alergiaClicada.reacoes.map(r => r.nome) : [];
         setModalState('Edit');
         setAlergia(alergiaClicada.id)
         setNome(alergiaClicada.nome);
         setCategoriaEscolhida(categoriaIndex !== -1 ? categoriaIndex : -1);
         setGravidade(alergiaClicada.gravidade);
         setReacoes(reacoesNomes);
-        // setDescricao(alergiaClicada.descricao); // Você também deve setar a descrição
-        
         setMostrarModal(true);
     }, []);
 
@@ -185,24 +151,21 @@ const Alergias = () => {
             Alert.alert("Campos obrigatórios", "Por favor, preencha nome, categoria e gravidade.");
             return;
         }
-
         setIsSaving(true);
-
         const dadosNovaAlergia = {
             nome: nome,
             categoria: CATEGORIAS[categoriaEscolhida].nome,
             gravidade: gravidade,
             descricao: descricao,
-            reacoes: reacoes
+            reacoes: reacoes,
+            usuario_id: usuario.id 
         };
-
         try {
             await api.post('/alergias', dadosNovaAlergia);
             fecharModal();
             await fetchAlergias();
         } catch (e) {
-            console.error("Erro ao salvar alergia:", e.response ? e.response.data : e.message);
-            Alert.alert("Erro", "Não foi possível registrar a alergia. Tente novamente.");
+            Alert.alert("Erro", "Não foi possível registrar a alergia.");
         } finally {
             setIsSaving(false);
         }
@@ -219,8 +182,8 @@ const Alergias = () => {
                     <FontAwesome5 name="backward" size={0.0444 * width} color="#97B9E5" />
                 </Pressable>
 
-                <Pressable style={styles.headerBtn}>
-                    <Ionicons name="settings-sharp" size={0.0444 * width} color="#97B9E5" />
+                <Pressable style={styles.headerBtn} onPress={() => setMostrarModalAjuda(true)}>
+                    <Ionicons name="help-circle" size={0.05 * width} color="#97B9E5" />
                 </Pressable>
             </View>
 
@@ -234,7 +197,6 @@ const Alergias = () => {
             <View style={styles.status}>
                 <View style={styles.statusCard}>
                     <FontAwesome5 name="shield-alt" size={width * 0.125} color="#6C83A1" />
-
                     <Text style={{
                         fontFamily: 'Poppins-M',
                         fontSize: 8 * scale,
@@ -262,269 +224,215 @@ const Alergias = () => {
                 </Pressable>
             </View>
 
-            <ScrollView style={{
-                flex: 1,
-                width: '100%',
-            }} contentContainerStyle={{
-                gap: 0.0222 * height,
-            }}>
-                {
-                    alergias.length > 0 && alergias.map((a, i) => {
-                        const categoriaInfo = CATEGORIAS.find(c => c.nome === a.categoria) 
-                            || CATEGORIAS.find(c => c.nome === 'Outros');
+            <ScrollView style={{ flex: 1, width: '100%' }} contentContainerStyle={{ gap: 0.0222 * height }}>
+                {alergias.length > 0 && alergias.map((a, i) => {
+                    const categoriaInfo = CATEGORIAS.find(c => c.nome === a.categoria) || CATEGORIAS.find(c => c.nome === 'Outros');
+                    const gravidadeCores = { 'Leve': '#b0e3c7', 'Moderada': '#fff1a8', 'Severa': '#f4978e' };
+                    const gravidadeCor = gravidadeCores[a.gravidade] || '#dedede';
+                    const IconLib = categoriaInfo.icon.lib;
 
-                        const gravidadeCores = {
-                            'Leve': '#b0e3c7',
-                            'Moderada': '#fff1a8',
-                            'Severa': '#f4978e'
-                        };
-                        const gravidadeCor = gravidadeCores[a.gravidade] || '#dedede';
-
-                        const IconLib = categoriaInfo.icon.lib;
-
-                        return (
-                            <Pressable style={styles.allergy} key={i} onPress={() => handleOpenUpdateModal(a)}>
-                                <View style={styles.allergyInfo}>
-                                    <IconLib 
-                                        name={categoriaInfo.icon.nome} 
-                                        size={width * 0.1} 
-                                        color={categoriaInfo.cor} 
-                                    />
-
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 8 * scale,
-                                        color: categoriaInfo.cor,
-                                        lineHeight: 11 * scale
-                                    }}>{a.nome}</Text>
-                                </View>
-
-                                <Ionicons 
-                                    name="alert-circle" 
-                                    size={width * 0.1} 
-                                    color={gravidadeCor}
-                                />
-                            </Pressable>
-                        )
-                    })
-                }
+                    return (
+                        <Pressable style={styles.allergy} key={i} onPress={() => handleOpenUpdateModal(a)}>
+                            <View style={styles.allergyInfo}>
+                                <IconLib name={categoriaInfo.icon.nome} size={width * 0.1} color={categoriaInfo.cor} />
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: categoriaInfo.cor, lineHeight: 11 * scale }}>{a.nome}</Text>
+                            </View>
+                            <Ionicons name="alert-circle" size={width * 0.1} color={gravidadeCor} />
+                        </Pressable>
+                    )
+                })}
             </ScrollView>
 
             <Modal visible={mostrarModal} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.allergyModalContainer}>
-                    <View style={styles.allergyModal}>
-                        <Text style={{
-                            fontFamily: 'Poppins-M',
-                            fontSize: 8 * scale,
-                            color: '#6C83A1',
-                            lineHeight: 10 * scale 
-                        }}>Registrar nova alergia</Text>
-
-                        <View style={styles.allergyModalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Nome</Text>
-
-                            <TextInput style={{
-                                width: '100%',
-                                height: 0.0444 * height,
-                                padding: 0.008 * height,
-                                fontFamily: 'Poppins-M',
-                                fontSize: 6 * scale,
-                                lineHeight: 8 * scale,
-                                backgroundColor: '#fff',
-                                borderColor: '#eee',
-                                borderWidth: 0.002 * height,
-                                borderRadius: 0.01 * height,
-                                color: '#6C83A1',
-                            }} scrollEnabled={false} multiline={false} value={nome} onChangeText={setNome}></TextInput>
-                        </View>
-
-                        <View style={styles.allergyModalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Categoria</Text>
-
-                            <Pressable style={styles.allergyModalSelect}onPress={() => setMostrarCategorias(!mostrarCategorias)}>
+                    <Pressable style={styles.modalBackdrop} onPress={fecharModal}>
+                        <Pressable style={styles.allergyModal} onPress={(e) => e.stopPropagation()}>
+                            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <Text style={{
                                     fontFamily: 'Poppins-M',
-                                    fontSize: 6 * scale,
+                                    fontSize: 8 * scale,
                                     color: '#6C83A1',
-                                    lineHeight: 9 * scale,
-                                }}>{categoriaEscolhida !== -1 ? CATEGORIAS[categoriaEscolhida].nome : 'Selecione uma categoria'}</Text>
-                            </Pressable>
+                                    lineHeight: 10 * scale 
+                                }}>{modalState === 'Create' ? 'Registrar nova alergia' : 'Editar alergia'}</Text>
 
-                            {mostrarCategorias && <View style={styles.allergyModalOptionsContainer}>
-                                <ScrollView style={{
-                                    width: '100%',
-                                    height: '100%',
-                                }} contentContainerStyle={{
-                                    gap: 0.0222 * width,
-                                }} showsVerticalScrollIndicator={false}>
-                                    {CATEGORIAS.map((c, i) => (
-                                        <Pressable style={styles.allergyModalOption} key={i} onPress={() => {
-                                            setCategoriaEscolhida(i);
-                                            setMostrarCategorias(false);
-                                        }}>
-                                            <c.icon.lib name={c.icon.nome} size={width * 0.05} color={c.cor} />
-
-                                            <Text style={{
-                                                fontFamily: 'Poppins-M',
-                                                fontSize: 5 * scale,
-                                                color: c.cor,
-                                            }}>{c.nome}</Text>
-                                        </Pressable>
-                                    ))}
-                                </ScrollView>
-                            </View>}
-                        </View>
-
-                        <View style={styles.allergyModalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Gravidade</Text>
-
-                            <View style={styles.allergyModalRadioBtns}>
-                                <Pressable style={styles.allergyModalRadioBtn} onPress={() => setGravidade('Leve')}>
-                                    {gravidade === 'Leve' ? <Octicons name="check-circle-fill" size={width * 0.05} color="#b0e3c7" />
-                                    : 
-                                        <View style={[styles.circle, { borderColor: '#b0e3c7' }]}></View>
-                                    }
-
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: '#b0e3c7',
-                                        lineHeight: 6.6 * scale 
-                                    }}>Leve</Text>
-                                </Pressable>
-
-                                <Pressable style={styles.allergyModalRadioBtn} onPress={() => setGravidade('Moderada')}>
-                                    {gravidade === 'Moderada' ? <Octicons name="check-circle-fill" size={width * 0.05} color="#fff1a8" />
-                                    : 
-                                        <View style={[styles.circle, { borderColor: '#fff1a8' }]}></View>
-                                    }
-
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: '#fff1a8',
-                                        lineHeight: 6.6 * scale 
-                                    }}>Leve</Text>
-                                </Pressable>
-
-                                <Pressable style={styles.allergyModalRadioBtn} onPress={() => setGravidade('Severa')}>
-                                    {gravidade === 'Severa' ? <Octicons name="check-circle-fill" size={width * 0.05} color="#f4978e" />
-                                    : 
-                                        <View style={[styles.circle, { borderColor: '#f4978e' }]}></View>
-                                    }
-
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: '#f4978e',
-                                        lineHeight: 6.6 * scale 
-                                    }}>Severa</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-
-                        <View style={styles.allergyModalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Reações comuns</Text>
-
-                            <View style={styles.allergyModalChipInput}>
-                                <TextInput style={{
-                                    flex: 1,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                }} scrollEnabled={false} multiline={false} value={reacao} onChangeText={setReacao}></TextInput>
-
-                                <Pressable style={styles.allergyModalAddReactionBtn} onPress={() => {
-                                    setReacoes(prev => [...prev, reacao]);
-                                    setReacao();
-                                }}>
-                                    <Entypo name="plus" size={24} color="#fff" />
-                                </Pressable>
+                                {modalState === 'Edit' && (
+                                    <Pressable onPress={handleDeleteAlergia}>
+                                        <MaterialCommunityIcons name="trash-can-outline" size={24} color="#f4978e" />
+                                    </Pressable>
+                                )}
                             </View>
 
-                            {reacoes.length > 0 && <View style={styles.allergyModalReactionsContainer}>
-                                <ScrollView style={{
-                                    width: '100%',
-                                    maxHeight: '100%',
-                                }} contentContainerStyle={{
-                                    gap: 0.0222 * width
-                                }}>
-                                    {reacoes.map((r, i) => (
-                                        <View style={styles.allergyModalReaction} key={i}>
-                                            <Text style={{
-                                                fontFamily: 'Poppins-M',
-                                                fontSize: 6 * scale,
-                                                color: '#6C83A1',
-                                                lineHeight: 8 * scale 
-                                            }}>{r}</Text>
+                            <View style={styles.allergyModalInput}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Nome</Text>
+                                <TextInput style={styles.textInputStyle} scrollEnabled={false} multiline={false} value={nome} onChangeText={setNome}></TextInput>
+                            </View>
 
-                                            <Pressable onPress={() => setReacoes(prev => prev.filter((v, index) => index !== i))}>
-                                                <AntDesign name="close-circle" size={(0.15 * height - 0.0444 * width) / 3 - 0.0444 * width} color="#6C83A1" />
+                            <View style={styles.allergyModalInput}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Categoria</Text>
+                                <Pressable style={styles.allergyModalSelect} onPress={() => setMostrarCategorias(!mostrarCategorias)}>
+                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1', lineHeight: 9 * scale }}>{categoriaEscolhida !== -1 ? CATEGORIAS[categoriaEscolhida].nome : 'Selecione uma categoria'}</Text>
+                                </Pressable>
+                                {mostrarCategorias && <View style={styles.allergyModalOptionsContainer}>
+                                    <ScrollView style={{ width: '100%', height: '100%' }} contentContainerStyle={{ gap: 0.0222 * width }} showsVerticalScrollIndicator={false}>
+                                        {CATEGORIAS.map((c, i) => (
+                                            <Pressable style={styles.allergyModalOption} key={i} onPress={() => { setCategoriaEscolhida(i); setMostrarCategorias(false); }}>
+                                                <c.icon.lib name={c.icon.nome} size={width * 0.05} color={c.cor} />
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 5 * scale, color: c.cor }}>{c.nome}</Text>
                                             </Pressable>
-                                        </View>
-                                    ))}
-                                </ScrollView>
-                            </View>}
-                        </View>
+                                        ))}
+                                    </ScrollView>
+                                </View>}
+                            </View>
 
-                        <View style={styles.allergyModalActions}>
-                            <Pressable style={styles.allergyModalBtn} onPress={fecharModal}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: '#6C83A1',
-                                    lineHeight: 7.7 * scale 
-                                }}>Cancelar</Text>
-                            </Pressable>
+                            <View style={styles.allergyModalInput}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Gravidade</Text>
+                                <View style={styles.allergyModalRadioBtns}>
+                                    {['Leve', 'Moderada', 'Severa'].map((g, i) => {
+                                        const colors = { 'Leve': '#b0e3c7', 'Moderada': '#fff1a8', 'Severa': '#f4978e' };
+                                        return (
+                                            <Pressable key={i} style={styles.allergyModalRadioBtn} onPress={() => setGravidade(g)}>
+                                                {gravidade === g ? <Octicons name="check-circle-fill" size={width * 0.05} color={colors[g]} />
+                                                : <View style={[styles.circle, { borderColor: colors[g] }]}></View> }
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: colors[g], lineHeight: 6.6 * scale }}>{g}</Text>
+                                            </Pressable>
+                                        )
+                                    })}
+                                </View>
+                            </View>
 
-                            <Pressable 
+                            <View style={styles.allergyModalInput}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Reações comuns</Text>
+                                <View style={styles.allergyModalChipInput}>
+                                    <TextInput style={[styles.textInputStyle, {flex: 1}]} scrollEnabled={false} multiline={false} value={reacao} onChangeText={setReacao}></TextInput>
+                                    <Pressable style={styles.allergyModalAddReactionBtn} onPress={() => { setReacoes(prev => [...prev, reacao]); setReacao(''); }}>
+                                        <Entypo name="plus" size={24} color="#fff" />
+                                    </Pressable>
+                                </View>
+                                {reacoes.length > 0 && <View style={styles.allergyModalReactionsContainer}>
+                                    <ScrollView style={{ width: '100%', maxHeight: '100%' }} contentContainerStyle={{ gap: 0.0222 * width }}>
+                                        {reacoes.map((r, i) => (
+                                            <View style={styles.allergyModalReaction} key={i}>
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1', lineHeight: 8 * scale }}>{r}</Text>
+                                                <Pressable onPress={() => setReacoes(prev => prev.filter((v, index) => index !== i))}>
+                                                    <AntDesign name="close-circle" size={(0.15 * height - 0.0444 * width) / 3 - 0.0444 * width} color="#6C83A1" />
+                                                </Pressable>
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                </View>}
+                            </View>
+
+                            <View style={styles.allergyModalActions}>
+                                <Pressable style={styles.allergyModalBtn} onPress={fecharModal}>
+                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Cancelar</Text>
+                                </Pressable>
+                                <Pressable 
                                     style={[styles.allergyModalBtn, { backgroundColor: '#6C83A1' }, isSaving && { opacity: 0.7 }]} 
-                                    onPress={() => {
-                                        if (modalState === 'Create') {
-                                            handleSaveAlergia();
-                                        } else {
-                                            handleUpdateAlergia();
-                                        }   
-                                    }}
+                                    onPress={() => { modalState === 'Create' ? handleSaveAlergia() : handleUpdateAlergia(); }}
                                     disabled={isSaving}
                                 >
-                                    {isSaving ? (
-                                        <ActivityIndicator size="small" color="#fff" />
-                                    ) : (
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 7 * scale,
-                                            color: '#fff',
-                                            lineHeight: 7.7 * scale 
-                                        }}>Salvar</Text>
-                                    )}
+                                    {isSaving ? <ActivityIndicator size="small" color="#fff" /> : 
+                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff', lineHeight: 7.7 * scale }}>Salvar</Text>}
                                 </Pressable>
-                        </View>
-                    </View>
+                            </View>
+                        </Pressable>
+                    </Pressable>
+                </BlurView>
+            </Modal>
+
+            {/* Modal de Ajuda */}
+            <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
+                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.allergyModalContainer}>
+                    <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
+                        <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
+                            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+                            </View>
+
+                            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
+                                <View style={styles.helpSection}>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-SB',
+                                        fontSize: 9 * scale,
+                                        color: '#6C83A1',
+                                    }}>Alergias</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Função:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Registrar alergias para fácil acesso.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Campos:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Tipo, reação, observações.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Como usar:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Insira suas alergias e sintomas.</Text>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>O app salva para consulta rápida.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Resultado esperado:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Lista rápida para mostrar em consultas e emergências.</Text>
+                                </View>
+                            </ScrollView>
+
+                            <Pressable style={[styles.allergyModalBtn, { marginTop: 0.0222 * height }]} onPress={() => setMostrarModalAjuda(false)}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>Entendi</Text>
+                            </Pressable>
+                        </Pressable>
+                    </Pressable>
                 </BlurView>
             </Modal>
         </View>

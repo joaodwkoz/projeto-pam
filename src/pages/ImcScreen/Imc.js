@@ -11,6 +11,7 @@ import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 import api from '../../services/api';
+import { BlurView } from 'expo-blur';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -63,6 +64,9 @@ const Imc = () => {
     const [velocimetroSize, setVelocimetroSize] = useState({ width: 0, height: 0 });
     const [ultimoRegistro, setUltimoRegistro] = useState(null);
 
+    // Estado do Modal de Ajuda
+    const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
+
     const fetchLatestRegistry = useCallback(async () => {
         try {
             const res = await api.get(`/usuario/${usuario.id}/imc/ultimo`);
@@ -111,6 +115,14 @@ const Imc = () => {
         fetchLatestRegistry();
     }, [fetchLatestRegistry]);
 
+    if (!fontsLoaded) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F0F4F7' }}>
+                <ActivityIndicator size="large" color="#6C83A1" />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -118,8 +130,8 @@ const Imc = () => {
                     <FontAwesome5 name="backward" size={0.0444 * width} color="#97B9E5" />
                 </Pressable>
 
-                <Pressable style={styles.headerBtn}>
-                    <Ionicons name="settings-sharp" size={0.0444 * width} color="#97B9E5" />
+                <Pressable style={styles.headerBtn} onPress={() => setMostrarModalAjuda(true)}>
+                    <Ionicons name="help-circle" size={0.05 * width} color="#97B9E5" />
                 </Pressable>
             </View>
 
@@ -270,6 +282,98 @@ const Imc = () => {
             </View>
 
             <ImcModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} height={height} width={width} scale={scale}></ImcModalHistorico>
+
+            {/* Modal de Ajuda */}
+            <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
+                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
+                    <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
+                        <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
+                            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+                            </View>
+
+                            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
+                                <View style={styles.helpSection}>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-SB',
+                                        fontSize: 9 * scale,
+                                        color: '#6C83A1',
+                                    }}>IMC</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Função:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Calcular e monitorar o Índice de Massa Corporal.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Campos:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Peso, altura.</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Como usar:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Insira seus dados nas roletas.</Text>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Toque em "Calcular".</Text>
+                                </View>
+
+                                <View style={styles.helpSection}>
+                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                        <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 7 * scale,
+                                            color: '#6C83A1',
+                                        }}>Resultado esperado:</Text>
+                                    </View>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 6 * scale,
+                                        color: '#8A9CB3',
+                                    }}>Cálculo automático do IMC + histórico de evolução.</Text>
+                                </View>
+                            </ScrollView>
+                        </Pressable>
+                    </Pressable>
+                </BlurView>
+            </Modal>
         </View>
     )
 }

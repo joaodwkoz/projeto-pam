@@ -1,11 +1,11 @@
-import { View, Pressable, Text, PixelRatio, useWindowDimensions, ActivityIndicator, SectionList, ScrollView } from 'react-native';
+import { View, Pressable, Text, PixelRatio, useWindowDimensions, ActivityIndicator, SectionList, ScrollView, Modal } from 'react-native';
 import { useState, useEffect, useContext, useCallback, useRef, useMemo } from 'react';
 import BottomSheet, { BottomSheetModal, BottomSheetTextInput, BottomSheetScrollView, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 import api from '../../services/api';
-import WheelPicker from '@quidone/react-native-wheel-picker';
+import { BlurView } from 'expo-blur';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -14,7 +14,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Octicons from '@expo/vector-icons/Octicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 import { dynamicStyles } from './styles';
+
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BatimentoModalGrafico from '../../components/BatimentoModalGrafico';
 
@@ -34,10 +36,11 @@ const Batimentos = () => {
     });
 
     const scale = PixelRatio.get();
-
     const navigation = useNavigation();
-
     const { usuario } = useContext(AuthContext);
+
+    // Estado do Modal de Ajuda
+    const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const getHeartColor = (bpm) => {
         if (bpm > 100) {
@@ -76,9 +79,7 @@ const Batimentos = () => {
 
     const clearModal = () => {
         setModalState('Create');
-
         setBatimento(-1);
-
         setBpm('');
         setCondicao('');
         setObservacoes('');
@@ -99,9 +100,7 @@ const Batimentos = () => {
 
     const handleUpdateInfoModal = (id, bpm, condicao, hora, data, observacoes) => {
         setModalState('Edit');
-
         setBatimento(id);
-
         setBpm(bpm.toString());
         setCondicao(condicao);
         setObservacoes(observacoes);
@@ -128,7 +127,6 @@ const Batimentos = () => {
     }
 
     const [periodo, setPeriodo] = useState('7d');
-
     const [batimento, setBatimento] = useState(-1);
     const [bpm, setBpm] = useState('');
     const [condicao, setCondicao] = useState('');
@@ -159,12 +157,9 @@ const Batimentos = () => {
 
     const handleSaveMedition = async () => {
         const bpmInt = Number(bpm);
-
         const pad = (num) => String(num).padStart(2, '0');
-
         const dataFormatada = `${data.ano}-${pad(data.mes)}-${pad(data.dia)}`;
         const horaFormatada = `${pad(horario.hora)}:${pad(horario.minuto)}:00`;
-
         const dataHoraMedicao = `${dataFormatada} ${horaFormatada}`;
 
         const dataNovoBatimento = {
@@ -178,7 +173,7 @@ const Batimentos = () => {
             await api.post('/batimentos', dataNovoBatimento);
             handleCloseModal();
             fetchUserHistory();
-            fetchUserCards();0
+            fetchUserCards();
         } catch(e) {
             console.error('Ocorreu um erro ao salvar', e);
         }
@@ -186,12 +181,9 @@ const Batimentos = () => {
 
     const handleUpdateMedition = async () => {
         const bpmInt = Number(bpm);
-
         const pad = (num) => String(num).padStart(2, '0');
-
         const dataFormatada = `${data.ano}-${pad(data.mes)}-${pad(data.dia)}`;
         const horaFormatada = `${pad(horario.hora)}:${pad(horario.minuto)}:00`;
-
         const dataHoraMedicao = `${dataFormatada} ${horaFormatada}`;
 
         const dataNovoBatimento = {
@@ -222,7 +214,6 @@ const Batimentos = () => {
         if (sheetIndex >= 0 && index === -1) {
             dismissModal();
         }
-
         setSheetIndex(index);
     }, [sheetIndex]);
 
@@ -232,7 +223,6 @@ const Batimentos = () => {
 
     const [cards, setCards] = useState({});
     const [isLoadingCards, setIsLoadingCards] = useState(true);
-
     const [history, setHistory] = useState([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
@@ -249,7 +239,6 @@ const Batimentos = () => {
 
     const fetchUserHistory = useCallback(async () => {
         setIsLoadingHistory(true);
-
         try {
             const res = await api.get(`/usuario/${usuario.id}/batimentos-por-periodo?periodo=${periodo}`); 
             setHistory(res.data.historico);
@@ -281,8 +270,8 @@ const Batimentos = () => {
                             <FontAwesome5 name="backward" size={0.0444 * width} color="#97B9E5" />
                         </Pressable>
 
-                        <Pressable style={styles.headerBtn}>
-                            <Ionicons name="settings-sharp" size={0.0444 * width} color="#97B9E5" />
+                        <Pressable style={styles.headerBtn} onPress={() => setMostrarModalAjuda(true)}>
+                            <Ionicons name="help-circle" size={0.05 * width} color="#97B9E5" />
                         </Pressable>
                     </View>
 
@@ -320,10 +309,9 @@ const Batimentos = () => {
                             </View>
                         ): (
                             <>
-                                    <View style={styles.resumeCard}>
+                                <View style={styles.resumeCard}>
                                     <View style={styles.resumeCardInfo}>
                                         <AntDesign name="moon" size={0.025 * height} color="#baabf1ff" />
-
                                         <Text style={{
                                             fontFamily: 'Poppins-M',
                                             fontSize: 5 * scale,
@@ -331,8 +319,6 @@ const Batimentos = () => {
                                             lineHeight: 8 * scale
                                         }}>Repouso</Text>
                                     </View>
-                                    
-
                                     <Text style={{
                                         fontFamily: 'Poppins-M',
                                         fontSize: 6 * scale,
@@ -344,7 +330,6 @@ const Batimentos = () => {
                                 <View style={styles.resumeCard}>
                                     <View style={styles.resumeCardInfo}>
                                         <FontAwesome6 name="heart-pulse" size={24} color="#abc4f1ff" />
-
                                         <Text style={{
                                             fontFamily: 'Poppins-M',
                                             fontSize: 5 * scale,
@@ -352,8 +337,6 @@ const Batimentos = () => {
                                             lineHeight: 8 * scale
                                         }}>Média</Text>
                                     </View>
-                                    
-
                                     <Text style={{
                                         fontFamily: 'Poppins-M',
                                         fontSize: 6 * scale,
@@ -365,7 +348,6 @@ const Batimentos = () => {
                                 <View style={styles.resumeCard}>
                                     <View style={styles.resumeCardInfo}>
                                         <AntDesign name="fire" size={24} color="#f09b9bff" />
-
                                         <Text style={{
                                             fontFamily: 'Poppins-M',
                                             fontSize: 5 * scale,
@@ -373,8 +355,6 @@ const Batimentos = () => {
                                             lineHeight: 8 * scale
                                         }}>Máximo</Text>
                                     </View>
-                                    
-
                                     <Text style={{
                                         fontFamily: 'Poppins-M',
                                         fontSize: 6 * scale,
@@ -386,7 +366,6 @@ const Batimentos = () => {
                                 <View style={styles.resumeCard}>
                                     <View style={styles.resumeCardInfo}>
                                         <FontAwesome6 name="snowflake" size={24} color="#d6f1abff" />
-
                                         <Text style={{
                                             fontFamily: 'Poppins-M',
                                             fontSize: 5 * scale,
@@ -394,8 +373,6 @@ const Batimentos = () => {
                                             lineHeight: 8 * scale
                                         }}>Mínimo</Text>
                                     </View>
-                                    
-
                                     <Text style={{
                                         fontFamily: 'Poppins-M',
                                         fontSize: 6 * scale,
@@ -477,7 +454,7 @@ const Batimentos = () => {
                                                         fontSize: 6 * scale,
                                                         color: '#00000030',
                                                         lineHeight: 9 * scale
-                                                    }}>{item.condicao.charAt(0).toUpperCase() + item.condicao.slice(1)} - {item.hora}</Text>
+                                                    }}>{getCondicao(item.condicao)} - {item.hora}</Text>
                                                 </View>
                                             </View>
 
@@ -595,7 +572,7 @@ const Batimentos = () => {
                                     borderRadius: 0.01 * height,
                                     color: '#6C83A1',
                                     textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false} onChangeText={(text) => handleChangeData('dia', text)} value={data.dia.toString()}></BottomSheetTextInput>
+                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeData('dia', text)} value={data.dia.toString()}></BottomSheetTextInput>
 
                                 <Text style={{
                                     fontFamily: 'Poppins-M',
@@ -743,7 +720,7 @@ const Batimentos = () => {
                                 fontFamily: 'Poppins-M',
                                 fontSize: 7 * scale,
                                 color: '#6C83A1',
-                                lineHeight: 7.7 * scale
+                                lineHeight: 7.7 * scale 
                             }}>
                                 Observações
                             </Text>
@@ -783,6 +760,98 @@ const Batimentos = () => {
                 </BottomSheetModal>
 
                 <BatimentoModalGrafico visible={graficoModalVisible} setVisible={setGraficoModalVisible} width={width} height={height} scale={scale}></BatimentoModalGrafico>
+
+                {/* Modal de Ajuda */}
+                <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
+                    <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
+                        <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
+                            <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
+                                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+                                </View>
+
+                                <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
+                                    <View style={styles.helpSection}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-SB',
+                                            fontSize: 9 * scale,
+                                            color: '#6C83A1',
+                                        }}>Batimentos</Text>
+                                    </View>
+
+                                    <View style={styles.helpSection}>
+                                        <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                            <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
+                                            <Text style={{
+                                                fontFamily: 'Poppins-SB',
+                                                fontSize: 7 * scale,
+                                                color: '#6C83A1',
+                                            }}>Função:</Text>
+                                        </View>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: '#8A9CB3',
+                                        }}>Monitorar a frequência cardíaca (BPM).</Text>
+                                    </View>
+
+                                    <View style={styles.helpSection}>
+                                        <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                            <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
+                                            <Text style={{
+                                                fontFamily: 'Poppins-SB',
+                                                fontSize: 7 * scale,
+                                                color: '#6C83A1',
+                                            }}>Campos:</Text>
+                                        </View>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: '#8A9CB3',
+                                        }}>BPM, data, hora, condição (repouso, exercício).</Text>
+                                    </View>
+
+                                    <View style={styles.helpSection}>
+                                        <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                            <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
+                                            <Text style={{
+                                                fontFamily: 'Poppins-SB',
+                                                fontSize: 7 * scale,
+                                                color: '#6C83A1',
+                                            }}>Como usar:</Text>
+                                        </View>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: '#8A9CB3',
+                                        }}>Meça seus batimentos (manual ou smartwatch).</Text>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: '#8A9CB3',
+                                        }}>Registre no app para acompanhar a evolução.</Text>
+                                    </View>
+
+                                    <View style={styles.helpSection}>
+                                        <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                            <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
+                                            <Text style={{
+                                                fontFamily: 'Poppins-SB',
+                                                fontSize: 7 * scale,
+                                                color: '#6C83A1',
+                                            }}>Resultado esperado:</Text>
+                                        </View>
+                                        <Text style={{
+                                            fontFamily: 'Poppins-M',
+                                            fontSize: 6 * scale,
+                                            color: '#8A9CB3',
+                                        }}>Gráficos de tendência e controle da saúde cardíaca.</Text>
+                                    </View>
+                                </ScrollView>
+                            </Pressable>
+                        </Pressable>
+                    </BlurView>
+                </Modal>
             </BottomSheetModalProvider>
         </GestureHandlerRootView>
     )

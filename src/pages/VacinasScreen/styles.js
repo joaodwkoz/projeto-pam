@@ -27,23 +27,26 @@ StyleSheet.create({
         backgroundColor: '#fff',
     },
 
-    sectionHeaderCard: {
+    // --- Estilos do Modal de Ajuda ---
+    modalBackdrop: {
+        flex: 1,
         width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 0.025 * width,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    helpModal: {
+        width: '82%',
+        maxHeight: '60%',
+        backgroundColor: '#fefefe',
+        borderRadius: 0.025 * height,
         padding: 0.0444 * width,
-        gap: 0.0222 * width,
+        alignItems: 'center',
+        gap: 0.0222 * height, 
     },
 
-    vacinaItem: {
+    helpSection: {
         width: '100%',
-        backgroundColor: '#fafafa',
-        borderRadius: 0.02 * width,
-        padding: 0.0333 * width,
-    },
-
-    separator: {
-        width: '100%',
-        height: 0.0222 * width,
+        gap: 0.01 * height,
     },
 });

@@ -4,17 +4,15 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     container: {
         width: '100%',
         flex: 1,
-        backgroundColor: '#F0F4F7',
         padding: 0.0889 * width,
         gap: 0.0444 * width,
-        position: 'relative',
     },
 
     header: {
         width: '100%',
         height: 0.046 * height,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
 
     headerBtn: {
@@ -23,144 +21,208 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 9999,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff'
-    },
-
-    status: {
-        width: '100%',
-        height: 0.125 * height,
         backgroundColor: '#fff',
-        borderRadius: 0.0195 * height,
-        justifyContent: 'center',
-        padding: 0.0666 * width,
     },
 
-    statusCard: {
+    headerSection: {
+        width: '100%',
         flexDirection: 'row',
-        gap: 0.0444 * width,
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
 
-    statusCardIndicator: {
-        height: 0.035 * height,
-        aspectRatio: 1,
-        borderRadius: 9999,
-        backgroundColor: '#000'
+    graphViewBtn: {
+        width: '12.5%',
+        aspectRatio: 1 / 1,
+        backgroundColor: '#6C83A1',
+        borderRadius: 0.02 * width,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    resumeSection: {
+        width: '100%',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 0.0444 * width,
+    },
+
+    resumeCard: {
+        width: (0.82219 * width - 0.0444 * width) / 2,
+        height: 0.085 * height,
+        backgroundColor: '#fff',
+        borderRadius: 0.025 * width,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 0.0222 * width,
+    },
+
+    resumeCardInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 0.0222 * width,
+    },
+
+    historyOptions: {
+        width: '100%',
+        flexDirection: 'row',
+        gap: 0.0222 * width,
+        alignItems: 'center',
+    },
+
+    historyOption: {
+        padding: 0.0125 * height,
+        backgroundColor: '#fff',
+        borderRadius: 0.0125 * width,
     },
 
     history: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-
-    historyBtns: {
-        flexDirection: 'row',
-        gap: 0.0444 * width,
-    },
-
-    historyBtn: {
-        height: 0.05 * height,
-        aspectRatio: 1,
-        backgroundColor: '#6C83A1',
-        borderRadius: 0.0075 * height,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    historyDate: {
-        gap: 0.0444 * width,
-    },
-
-    historyDateMeditions: {
-        gap: 0.0444 * width,
-    },
-
-    historyDateMedition: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#fff',
-        height: 0.1 * height,
-        borderRadius: 0.025 * width,
-        padding: 0.0333 * width,
-    },
-
-    meditionInfo: {
-        gap: 0.0222 * width,
-    },
-
-    meditionInfoValue: {
-        flexDirection: 'row',
-        gap: 0.0222 * width,
-        alignItems: 'center',
-    },
-
-    meditionIndicator: {
-        height: 0.03 * height,
-        aspectRatio: 1,
-        borderRadius: 9999,
-        backgroundColor: '#000'
-    },
-
-    meditionModalContainer: {
         flex: 1,
+        width: '100%',
+        gap: 0.0444 * width,
+    },
+
+    historyItem: {
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: 0.0333 * width,
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 0.0125 * width,
+    },
+
+    historyItemInfoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 0.0222 * width,
+    },
+
+    historyItemInfo: {
+        // Estilos para o texto ao lado do ícone
+    },
+
+    fab: {
+        position: 'absolute',
+        height: 0.06 * height,
+        aspectRatio: 1 / 1,
+        backgroundColor: '#6C83A1',
+        borderRadius: 0.0125 * width,
+        bottom: 0.0889 * width,
+        right: 0.0889 * width,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 0,
+    },
+
+    modalInput: {
+        width: '100%',
+        gap: 0.0444 * width,
+    },
+
+    modalDateInput: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 0.0222 * width,
+    },
+
+    modalTimeInput: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 0.0222 * width,
         justifyContent: 'center',
     },
 
-    meditionModalWrapper: {
-        width: '82%',
-        height: '45%',
-        backgroundColor: '#fefefe',
-        borderRadius: 0.025 * height,
-        padding: 0.0444 * width,
-        gap: 0.0222 * width,
-    },
-
-    meditionModalInput: {
-        gap: 0.0222 * width,
-    },
-
-    meditionModalChipInput: {
+    modalChipInput: {
         flexDirection: 'row',
         gap: 0.0222 * width,
         flexWrap: 'wrap',
         justifyContent: 'center',
     },
 
-    meditionModalChipInputOption: {
-        padding: 0.0222 * width,
+    modalChipInputOption: {
+        padding: 0.025 * width,
         backgroundColor: '#f0f0f0',
         borderRadius: 0.0125 * width,
     },
 
-    meditionModalDatePicker: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width
-    },
-
-    meditionModalTimePicker: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width,
-        justifyContent: 'center'
-    },
-
-    meditionModalActions: {
+    bottomSheetInput: {
         width: '100%',
-        height: 0.06 * height,
-        flexDirection: 'row',
-        gap: 0.0222 * width,
+        height: 0.05 * height,
+        padding: 0.008 * height,
+        backgroundColor: '#fff',
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        borderRadius: 0.01 * height,
+        color: '#6C83A1',
     },
 
-    meditionModalBtn: {
-        flex: 1,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 0.0125 * width,
+    dateInput: {
+        width: '15%',
+        height: 0.05 * height,
+        padding: 0.008 * height,
+        backgroundColor: '#fff',
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        borderRadius: 0.01 * height,
+        color: '#6C83A1',
+        textAlign: 'center',
+    },
+
+    yearInput: {
+        width: '20%',
+        height: 0.05 * height,
+        padding: 0.008 * height,
+        backgroundColor: '#fff',
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        borderRadius: 0.01 * height,
+        color: '#6C83A1',
+        textAlign: 'center',
+    },
+
+    saveBtn: {
+        width: '100%',
+        height: 0.0625 * height,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#6C83A1',
+        borderRadius: 0.1 * width,
+    },
+
+    // --- Estilos do Modal de Ajuda ---
+    modalBackdrop: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    helpModal: {
+        width: '82%',
+        maxHeight: '60%',
+        backgroundColor: '#fefefe',
+        borderRadius: 0.025 * height,
+        padding: 0.0444 * width,
+        alignItems: 'center',
+        gap: 0.0222 * height, 
+    },
+
+    helpSection: {
+        width: '100%',
+        gap: 0.01 * height,
+    },
+
+    modalBtn: {
+        flex: 1,
+        width: '100%',
+        maxHeight: 0.05 * height,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 0.0125 * width,
+        backgroundColor: '#f0f0f0',
+        marginTop: 0.0222 * height
     },
 });

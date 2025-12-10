@@ -1,28 +1,21 @@
+import { BlurView } from "expo-blur";
 import React, { useEffect, useState, useCallback, useContext } from "react";
 import { View, Image, Pressable, Modal, StyleSheet, Text, SectionList, ActivityIndicator } from "react-native";
-import { LineChart } from 'react-native-gifted-charts';
-import { BlurView } from "expo-blur";
-
-import { useAuth } from "../hooks/useAuth";
-import { useTheme } from "../hooks/useTheme";
-
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolate,
+} from "react-native-reanimated";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { AuthContext } from "../contexts/AuthContext";
 import api from "../services/api";
+import { LineChart } from 'react-native-gifted-charts';
+
 import { BASE_URL_STORAGE } from "../constants/api";
 
-import Ionicons from '@expo/vector-icons/Ionicons';
-
-const AguaModalHistorico = ({ visible, setVisible }) => {
-    const { usuario } = useAuth();
-
-    if (!usuario) {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <ActivityIndicator color='#6C83A1' size="large" />; 
-            </View>
-        )
-    }
-
-    const { width, height, colors, scale } = useTheme();
+const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
+    const { usuario } = useContext(AuthContext);
 
     const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
     const PADDING_BOTTOM = React.useMemo(() => 0.0444 * width, [width]);

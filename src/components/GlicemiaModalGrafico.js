@@ -1,12 +1,13 @@
 import { BlurView } from "expo-blur";
-import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { View, Pressable, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth } from "../hooks/useAuth";
-import api from "../services/api";
+import { useAuth } from "../hooks/useAuth"; // Ajuste o caminho se necessário
+import api from "../services/api"; // Ajuste o caminho se necessário
 import { LineChart } from 'react-native-gifted-charts';
+import * as Notifications from 'expo-notifications';
 
-const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) => {
+const GlicemiaModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) => {
     const { usuario } = useAuth();
     const [periodo, setPeriodo] = useState('7d');
     const [lineData, setLineData] = useState([]);
@@ -17,7 +18,7 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
     const MODAL_PADDING = 0.0444 * width;
     const CHART_CONTAINER_WIDTH = MODAL_VIEW_WIDTH - (2 * MODAL_PADDING);
 
-    const styles = React.useMemo(() => dynamicStyles(width, height), [width, height]);
+    const styles = React.useMemo(() => dynamicStyles(width, height, scale), [width, height, scale]);
 
     const sendNotification = async (title, body) => {
         await Notifications.scheduleNotificationAsync({
@@ -30,24 +31,26 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
         setIsLoading(true);
 
         try {
-            const res = await api.get(`/usuario/${usuario.id}/batimentos-grafico?periodo=${periodo}`); 
+            // Endpoint ajustado para glicemia
+            const res = await api.get(`/usuario/${usuario.id}/glicemias/grafico?periodo=${periodo}`); 
             setLineData(res.data.dados_grafico);
 
             if (res.data.dados_grafico && res.data.dados_grafico.length > 0) {
                 const lastValue = res.data.dados_grafico[res.data.dados_grafico.length - 1].value;
 
                 let mensagem = '';
-                if (lastValue < 50) mensagem = `Seu batimento está muito baixo: ${lastValue} bpm`;
-                else if (lastValue > 100) mensagem = `Seu batimento está alto: ${lastValue} bpm`;
+                // Lógica de alerta para Glicemia (Hipoglicemia < 70, Hiperglicemia > 140 - valores de exemplo)
+                if (lastValue < 70 && lastValue > 0) mensagem = `Atenção: Glicemia baixa (${lastValue} mg/dL)`;
+                else if (lastValue > 140) mensagem = `Atenção: Glicemia alta (${lastValue} mg/dL)`;
 
                 if (mensagem && !notifiedRef.current) {
-                    sendNotification("Alerta de Batimento", mensagem);
+                    sendNotification("Alerta de Glicemia", mensagem);
                     notifiedRef.current = true; 
                 }
             }
 
         } catch(e) {
-            console.error('Ocorreu um erro!', e);
+            console.error('Ocorreu um erro no gráfico!', e);
         } finally {
             setIsLoading(false);
         }
@@ -61,7 +64,7 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
     }, [visible, fetchChart]);
 
     return (
-        <Modal transparent animation='slide' visible={visible}>
+        <Modal transparent animationType='slide' visible={visible}>
             <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>
                 <View style={styles.modal}>
                     {!isLoading ? (
@@ -139,8 +142,8 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
                                                         fontSize: 5 * scale,
                                                         color: '#6C83A1',
                                                     }}
-                                                    minValue={30}
-                                                    maxValue={300}
+                                                    minValue={0} // Ajuste conforme necessário
+                                                    maxValue={300} // Ajuste conforme necessário para glicemia
                                                     yAxisLabelWidth={0.1 * width}
                                                     isSecondaryDataPoints
                                                 />
@@ -176,7 +179,7 @@ const BatimentoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }
     );
 };
 
-const dynamicStyles = (width, height) => StyleSheet.create({
+const dynamicStyles = (width, height, scale) => StyleSheet.create({
     modalContainer: {
         flex: 1,
         alignItems: 'center',
@@ -223,56 +226,10 @@ const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.0125 * width,
     },
 
-    tabSwitch: {
-        width: 'auto',
-        height: 0.05 * height,
-        backgroundColor: '#fafafa',
-        flexDirection: 'row',
-        borderRadius: 0.0125 * width,
-        padding: 0.015 * width,
-        gap: 0.015 * width,
-        position: 'relative',
-    },
-
-    tab: {
-        height: '100%',
-        width: 0.2 * width,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 2,
-    },
-
-    tabSwitchWrapper: {
-        position: 'absolute',
-        top: 0.015 * width,
-        left: 0.015 * width,
-        width: 0.2 * width,
-        height: '100%',
-        backgroundColor: '#fff',
-        zIndex: 1,
-        borderRadius: 0.0125 * width,
-    },
-
     modalContent: {
         maxHeight: 0.3 * height,
         width: '100%',
     },
-
-    historyItem: {
-        width: '100%',
-        height: 0.025 * height,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width,
-    },
-
-    historyItemInfo: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    }
 });
 
-export default BatimentoModalGrafico;
+export default GlicemiaModalGrafico;

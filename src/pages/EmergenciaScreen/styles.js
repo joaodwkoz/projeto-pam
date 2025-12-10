@@ -45,7 +45,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         padding: 0.0222 * width,
     },
 
-    locationAdress: {
+    locationAddress: {
         gap: 0.0111 * width,
     },
 
@@ -162,5 +162,43 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         alignItems: 'center',
         gap: 0.0222 * width,
         flexDirection: 'row',
+    },
+
+    // BottomSheet specific styles
+    bottomSheetInput: {
+        width: '100%',
+        height: 0.05 * height,
+        padding: 0.008 * height,
+        fontFamily: 'Poppins-M',
+        fontSize: 0.015 * height,
+        lineHeight: 0.02 * height,
+        backgroundColor: '#fff',
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        borderRadius: 0.01 * height,
+        color: '#6C83A1',
+    },
+
+    // --- Estilos do Modal de Ajuda ---
+    modalBackdrop: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    helpModal: {
+        width: '82%',
+        maxHeight: '60%',
+        backgroundColor: '#fefefe',
+        borderRadius: 0.025 * height,
+        padding: 0.0444 * width,
+        alignItems: 'center',
+        gap: 0.0222 * height, 
+    },
+
+    helpSection: {
+        width: '100%',
+        gap: 0.01 * height,
     },
 });

@@ -7,6 +7,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#F0F4F7',
         padding: 0.0889 * width,
         gap: 0.0444 * width,
+        position: 'relative',
     },
     
     header: {
@@ -25,13 +26,29 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#fff'
     },
 
-    widgets: {
-        width: '100%',
-        height: 0.0921 * height,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+    // --- Menu Opções ---
+    menuOptions: {
+        position: 'absolute',
+        width: 0.35 * width,
+        padding: 0.0222 * width,
+        borderRadius: 0.0175 * width,
+        top: 0.06 * height, 
+        right: 0.0889 * width,
+        backgroundColor: '#fefefe',
+        zIndex: 100,
+        gap: 0.0111 * width,
     },
-    
+
+    menuOption: {
+        flex: 1,
+        width: '100%',
+        paddingVertical: 0.01 * height,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fafafa',
+        borderRadius: 0.0111 * width,
+    },
+
     widgets: {
         width: '100%',
         height: 0.0921 * height,
@@ -90,13 +107,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * width,
     },
 
-    listItem: {
-        height: 0.0358 * height,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width,
-    },
-
     listFoodItem: {
         paddingVertical: 0.002 * height,
         flexDirection: 'row',
@@ -111,35 +121,71 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.0025 * width,
     },
 
+    // --- Modal Styles ---
     modalContainer: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#00000080',
     },
 
     modal: {
-        width: '75%',
-        borderRadius: 0.05 * width,
+        width: '82%',
+        borderRadius: 0.025 * height,
         padding: 0.0444 * width,
-        backgroundColor: '#597497',
+        backgroundColor: '#fefefe', // Mudado para branco
         gap: 0.0444 * width,
     },
+    
+    // Configuração e Ajuda (Modal)
+    modalBackdrop: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 
+    helpModal: {
+        width: '82%',
+        maxHeight: '60%',
+        backgroundColor: '#fefefe',
+        borderRadius: 0.025 * height,
+        padding: 0.0444 * width,
+        alignItems: 'center',
+        gap: 0.0222 * height, 
+    },
+
+    helpSection: {
+        width: '100%',
+        gap: 0.01 * height,
+    },
+    
+    // Inputs e Campos do Modal de Adicionar Comida (Adaptado para o tema claro)
     searchFood: {
         gap: 0.0444 * width,
     },
     
+    textInput: {
+        width: '100%',
+        height: 0.0444 * height,
+        padding: 0.01 * width,
+        fontFamily: 'Poppins-M',
+        backgroundColor: '#fff',
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        borderRadius: 0.01 * height,
+        color: '#6C83A1',
+    },
+
     options: {
-        width: 0.75 * width - 0.0444 * width * 2,
+        width: '100%',
         height: 0.235 * height,
-        position: 'absolute',
-        left: 0 * width,
-        top: 0.115 * height,
-        backgroundColor: '#324156',
+        backgroundColor: '#fff', // Fundo claro
         borderRadius: 0.015 * width,
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
         zIndex: 100,
         padding: 0.0222 * width,
-        overflow: 'visible',
     },
 
     option: {
@@ -156,7 +202,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     optionsSeparator: {
         width: '100%',
         height: 0.002 * height,
-        backgroundColor: '#293445',
+        backgroundColor: '#eee', // Separador claro
         borderRadius: 0.001 * height,
     },
 
@@ -176,7 +222,20 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 9999,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#354E70',
+        backgroundColor: '#6C83A1', // Azul padrão
+    },
+
+    portionInput: {
+        width: '40%',
+        height: 0.045 * height,
+        padding: 0.01 * width,
+        fontFamily: 'Poppins-M',
+        backgroundColor: '#fff',
+        borderRadius: 0.015 * width,
+        borderColor: '#eee',
+        borderWidth: 0.002 * height,
+        color: '#6C83A1',
+        textAlign: 'center'
     },
 
     total: {
@@ -191,7 +250,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#2B3F59',
+        backgroundColor: '#6C83A1',
         borderRadius: 0.015 * width,
     },
 
@@ -209,5 +268,10 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.015 * width,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    
+    modalInput: {
+        width: '100%',
+        gap: 0.0222 * width,
     },
 });
