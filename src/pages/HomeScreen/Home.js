@@ -32,7 +32,6 @@ const Home = () => {
         { nome: 'Cálculo de IMC', icon: 'weight', lib: FontAwesome5, route: 'Imc' },
         { nome: 'Minhas Alergias', icon: 'hand-holding-medical', lib: FontAwesome5, route: 'Alergias' },
         { nome: 'Glicemia', icon: 'water-percent', lib: MaterialCommunityIcons, route: 'Glicemia' },
-        { nome: 'UBS Próximas', icon: 'hospital-marker', lib: MaterialCommunityIcons, route: 'UbsProximas' }, // Adicionado
         { nome: 'Motivação Diária', icon: 'star', lib: Entypo, route: 'Motivacao' },
         { nome: 'Guia de Frutas', icon: 'fruit-watermelon', lib: MaterialCommunityIcons, route: 'Frutas' },
         { nome: 'Emergência', icon: 'ambulance', lib: FontAwesome5, route: 'Emergencia' },

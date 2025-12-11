@@ -2,8 +2,8 @@ import { BlurView } from "expo-blur";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { View, Pressable, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth } from "../hooks/useAuth"; // Ajuste o caminho se necessário
-import api from "../services/api"; // Ajuste o caminho se necessário
+import { useAuth } from "../hooks/useAuth";
+import api from "../services/api";
 import { LineChart } from 'react-native-gifted-charts';
 import * as Notifications from 'expo-notifications';
 
@@ -31,15 +31,15 @@ const GlicemiaModalGrafico = ({ visible, setVisible, width, height, scale = 3 })
         setIsLoading(true);
 
         try {
-            // Endpoint ajustado para glicemia
             const res = await api.get(`/usuario/${usuario.id}/glicemias/grafico?periodo=${periodo}`); 
             setLineData(res.data.dados_grafico);
+            console.log('Dados recebidos (API):', res.data.dados_grafico);
 
             if (res.data.dados_grafico && res.data.dados_grafico.length > 0) {
                 const lastValue = res.data.dados_grafico[res.data.dados_grafico.length - 1].value;
 
                 let mensagem = '';
-                // Lógica de alerta para Glicemia (Hipoglicemia < 70, Hiperglicemia > 140 - valores de exemplo)
+
                 if (lastValue < 70 && lastValue > 0) mensagem = `Atenção: Glicemia baixa (${lastValue} mg/dL)`;
                 else if (lastValue > 140) mensagem = `Atenção: Glicemia alta (${lastValue} mg/dL)`;
 
@@ -142,8 +142,8 @@ const GlicemiaModalGrafico = ({ visible, setVisible, width, height, scale = 3 })
                                                         fontSize: 5 * scale,
                                                         color: '#6C83A1',
                                                     }}
-                                                    minValue={0} // Ajuste conforme necessário
-                                                    maxValue={300} // Ajuste conforme necessário para glicemia
+                                                    minValue={0}
+                                                    maxValue={300}
                                                     yAxisLabelWidth={0.1 * width}
                                                     isSecondaryDataPoints
                                                 />

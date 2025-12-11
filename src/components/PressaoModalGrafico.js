@@ -78,7 +78,6 @@ const PressaoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) 
                 <View style={styles.modal}>
                     {!isLoading ? (
                         <>
-                            {/* HEADER */}
                             <View style={styles.modalHeader}>
                                 <Text
                                     style={{
@@ -97,7 +96,6 @@ const PressaoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) 
                                 </Pressable>
                             </View>
 
-                            {/* PERÍODOS */}
                             <View style={styles.modalBody}>
                                 <View style={styles.periodFilters}>
                                     {['24h', '7d', '30d', '365d'].map(p => (
@@ -125,7 +123,6 @@ const PressaoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) 
                                     ))}
                                 </View>
 
-                                {/* Legenda */}
                                 <View
                                     style={{
                                         flexDirection: 'row',
@@ -150,7 +147,6 @@ const PressaoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) 
                                     </View>
                                 </View>
 
-                                {/* GRÁFICO */}
                                 <View style={styles.modalContent}>
                                     {dataSistolica.length > 0 ? (
                                         <View

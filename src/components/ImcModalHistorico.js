@@ -18,10 +18,8 @@ import api from "../services/api";
 import { LineChart } from 'react-native-gifted-charts';
 
 const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
-    
     const { usuario } = useContext(AuthContext);
 
-    // --- Definição de Espaçamentos Dinâmicos ---
     const MODAL_WIDTH = 0.82 * width;
     const LABEL_WIDTH = 0.14 * width; 
     const CHART_WIDTH = MODAL_WIDTH - (0.0444 * width * 2) - LABEL_WIDTH - (0.0222 * width); 
@@ -30,7 +28,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
 
     const styles = useMemo(() => dynamicStyles(width, height, scale), [width, height, scale]);
 
-    // --- Estados ---
     const [aba, setAba] = useState('Histórico');
     const [viewMode, setViewMode] = useState('list'); 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -39,16 +36,14 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
     const [lineData, setLineData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // --- Lógica de Cores IMC ---
     const getImcIndicator = (imc) => {
-        if (imc < 18.5) return '#a8d0e6'; // Abaixo
-        if (imc < 25) return '#b0e3c7';   // Normal
-        if (imc < 30) return '#fff1a8';   // Sobrepeso
-        if (imc < 35) return '#ffd3a8';   // Obesidade I
-        return '#f4978e';                 // Obesidade II+
+        if (imc < 18.5) return '#a8d0e6';
+        if (imc < 25) return '#b0e3c7'; 
+        if (imc < 30) return '#fff1a8';  
+        if (imc < 35) return '#ffd3a8'; 
+        return '#f4978e';           
     }
 
-    // --- Funções API ---
     const fetchHistory = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -70,7 +65,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
         }
     }, [usuario.id]);
 
-    // --- Ações de Exclusão ---
     const requestDelete = (item) => {
         setSelectedItem(item);
         setViewMode('delete');
@@ -108,10 +102,7 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
     return (
         <Modal transparent animationType='fade' visible={visible}>
             <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>
-                
                 <View style={styles.modal}>
-                    
-                    {/* HEADER */}
                     <View style={styles.modalHeader}>
                         <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1', lineHeight: 8.8 * scale }}>
                             {viewMode === 'delete' ? 'Excluir Registro' : 'Histórico de IMC'}
@@ -130,7 +121,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                             <>
                                 {viewMode === 'list' && (
                                     <>
-                                        {/* ABAS */}
                                         <View style={styles.tabSwitch}>
                                             <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
                                                 <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140', lineHeight: 9 * scale }}>
@@ -145,7 +135,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                                             <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? 0.0111 * width : (0.2 * width) + (0.0111 * width * 2) }]}></View>
                                         </View>
 
-                                        {/* CONTEÚDO */}
                                         <View style={styles.tabContent}>
                                             {aba === 'Histórico' ? (
                                                 history && history.length > 0 ? (
@@ -156,7 +145,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                                                         renderItem={({ item }) => (
                                                             <View style={styles.historyItem}>
                                                                 <View style={styles.historyLeftInfo}>
-                                                                    {/* Indicador de Cor */}
                                                                     <View style={{
                                                                         height: 0.04 * width,
                                                                         width: 0.04 * width,
@@ -165,7 +153,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                                                                     }} />
                                                                     
                                                                     <View style={styles.historyItemText}>
-                                                                        {/* APENAS O IMC - 1 LINHA */}
                                                                         <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>
                                                                             {item.imc} kg/m²
                                                                         </Text>
@@ -192,7 +179,6 @@ const ImcModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =>
                                                     </View>
                                                 )
                                             ) : (
-                                                // --- GRÁFICO ---
                                                 lineData && lineData.length > 0 ? (
                                                     <View style={styles.chartContainer}>
                                                         <LineChart

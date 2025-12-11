@@ -42,6 +42,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { dynamicStyles } from './styles';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BatimentoModalGrafico from '../../components/BatimentoModalGrafico';
+import GlicemiaModalGrafico from '../../components/GlicemiaModalGrafico';
 
 let atual = new Date();
 
@@ -715,7 +716,7 @@ const Glicemia = () => {
                     </BottomSheetScrollView>
                 </BottomSheetModal>
 
-                <BatimentoModalGrafico visible={graficoModalVisible} setVisible={setGraficoModalVisible} width={width} height={height} scale={scale}></BatimentoModalGrafico>
+                <GlicemiaModalGrafico visible={graficoModalVisible} setVisible={setGraficoModalVisible} width={width} height={height} scale={scale}></GlicemiaModalGrafico>
 
                 <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                     <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>

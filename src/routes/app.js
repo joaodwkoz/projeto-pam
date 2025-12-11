@@ -14,7 +14,6 @@ import Emergencia from '../pages/EmergenciaScreen/Emergencia';
 import Pressao from '../pages/PressaoScreen/Pressao';
 import Vacinas from '../pages/VacinasScreen/Vacinas';
 import Remedios from '../pages/RemediosScreen/Remedios';
-import UbsProximas from '../pages/UbsProximasScreen/UbsProximas';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,7 +36,6 @@ export default function AppRoutes() {
             <Stack.Screen name="Pressao" component={Pressao} />
             <Stack.Screen name="Vacinas" component={Vacinas} />
             <Stack.Screen name="Remedios" component={Remedios} />
-            <Stack.Screen name="UbsProximas" component={UbsProximas} />
         </Stack.Navigator>
     )
 }

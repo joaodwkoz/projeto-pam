@@ -24,10 +24,8 @@ import { BASE_URL_STORAGE } from "../constants/api";
 const STORAGE_KEY_SETTINGS = 'water_settings';
 
 const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
-    
     const { usuario } = useContext(AuthContext);
 
-    // --- Definição de Espaçamentos Dinâmicos ---
     const S1 = 0.0111 * width; 
     const S2 = 0.0222 * width;
     const S4 = 0.0444 * width;
@@ -41,7 +39,6 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
 
     const styles = useMemo(() => dynamicStyles(width, height, scale), [width, height, scale]);
 
-    // --- Estados ---
     const [periodo, setPeriodo] = useState('Semana');
     const [aba, setAba] = useState('Histórico');
     const [viewMode, setViewMode] = useState('list'); 
@@ -52,7 +49,6 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
     const [isLoading, setIsLoading] = useState(false);
     const [metaMl, setMetaMl] = useState(4000);
 
-    // --- Funções ---
     const loadSettings = useCallback(async () => {
         try {
             const stored = await AsyncStorage.getItem(STORAGE_KEY_SETTINGS);
@@ -123,11 +119,8 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
 
     return (
         <Modal transparent animationType='fade' visible={visible}>
-            <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>
-                
+            <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>         
                 <View style={styles.modal}>
-                    
-                    {/* HEADER */}
                     <View style={styles.modalHeader}>
                         <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1', lineHeight: 8.8 * scale }}>
                             {viewMode === 'delete' ? 'Excluir Registro' : 'Visualizar Dados'}
@@ -146,7 +139,6 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
                             <>
                                 {viewMode === 'list' && (
                                     <>
-                                        {/* FILTROS */}
                                         <View style={styles.periodFilters}>
                                             {['Hoje', 'Semana', 'Mes', 'Ano'].map((p) => (
                                                 <Pressable 
@@ -161,7 +153,6 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
                                             ))}
                                         </View>
 
-                                        {/* ABAS */}
                                         <View style={styles.tabSwitch}>
                                             <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
                                                 <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140', lineHeight: 9 * scale }}>
@@ -176,7 +167,6 @@ const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) =
                                             <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? S1 : (0.2 * width) + (S1 * 2) }]}></View>
                                         </View>
 
-                                        {/* CONTEÚDO */}
                                         <View style={styles.tabContent}>
                                             {aba === 'Histórico' ? (
                                                 history && history.length > 0 ? (
@@ -326,12 +316,10 @@ const dynamicStyles = (width, height, scale) => {
             alignItems: 'center',
         },
 
-        // REMOVIDO minHeight DAQUI PARA TIRAR ESPAÇO EXTRA NO DELETE
         modalBody: {
             gap: 0.0222 * width,
         },
 
-        // ALTURA MÍNIMA APENAS NO LOADING PARA NÃO FICAR ACHATADO
         loadingContainer: {
             height: 0.2 * height, 
             justifyContent: 'center', 
@@ -444,11 +432,9 @@ const dynamicStyles = (width, height, scale) => {
             justifyContent: 'center',
         },
         
-        // CONTAINER EXCLUSÃO COMPACTO
         deleteContainer: {
             alignItems: 'center',
             justifyContent: 'center',
-            paddingTop: 0.0222 * width, // Padding Top reduzido
             gap: 0.0222 * width,
         },
 
