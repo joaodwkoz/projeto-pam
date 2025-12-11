@@ -89,7 +89,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center',
     },
 
-    // Backdrop Clicável
     modalBackdrop: {
         flex: 1,
         width: '100%',
@@ -141,33 +140,26 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
 
     remedyModalOptionsContainer: {
         position: 'absolute',
-        top: '105%', 
+        bottom: '110%', 
         left: 0,
         width: '100%',
-        height: 0.25 * height,
         padding: 0.0222 * width,
         backgroundColor: '#fff',
         borderColor: '#eee',
         borderWidth: 0.002 * height,
         borderRadius: 0.01 * height,
         zIndex: 100, 
-        elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
     },
 
     remedyModalOption: {
         width: '100%',
-        height: 0.06 * height,
+        height: 0.045 * height,
         backgroundColor: '#fafafa',
         borderRadius: 0.0125 * width,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 0.0222 * width,
+        padding: 0.0222 * width,
         gap: 0.0222 * width,
-        marginBottom: 0.005 * height
     },
 
     remedyModalActions: {
@@ -175,7 +167,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: 0.05 * height,
         flexDirection: 'row',
         gap: 0.0222 * width,
-        marginTop: 0.01 * height
     },
 
     remedyModalBtn: {

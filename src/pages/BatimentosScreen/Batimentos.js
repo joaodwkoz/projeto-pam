@@ -1,6 +1,30 @@
-import { View, Pressable, Text, PixelRatio, useWindowDimensions, ActivityIndicator, SectionList, ScrollView, Modal } from 'react-native';
-import { useState, useEffect, useContext, useCallback, useRef, useMemo } from 'react';
-import BottomSheet, { BottomSheetModal, BottomSheetTextInput, BottomSheetScrollView, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import { 
+    View, 
+    Pressable, 
+    Text, 
+    PixelRatio, 
+    useWindowDimensions, 
+    ActivityIndicator, 
+    SectionList, 
+    ScrollView, 
+    Modal, 
+    Alert 
+} from 'react-native';
+import { 
+    useState, 
+    useEffect, 
+    useContext, 
+    useCallback, 
+    useRef, 
+    useMemo 
+} from 'react';
+import BottomSheet, { 
+    BottomSheetModal, 
+    BottomSheetTextInput, 
+    BottomSheetScrollView, 
+    BottomSheetModalProvider, 
+    BottomSheetView 
+} from '@gorhom/bottom-sheet';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -16,7 +40,6 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { dynamicStyles } from './styles';
-
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BatimentoModalGrafico from '../../components/BatimentoModalGrafico';
 
@@ -39,7 +62,6 @@ const Batimentos = () => {
     const navigation = useNavigation();
     const { usuario } = useContext(AuthContext);
 
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const getHeartColor = (bpm) => {
@@ -59,110 +81,139 @@ const Batimentos = () => {
             'monitoramento': 'Monitoramento',
             'aleatorio': 'Aleatório'
         }
-
-        return mp[condicao];
+        return mp[condicao] || condicao;
     }
 
     const bottomSheetRef = useRef(null);
     const [sheetIndex, setSheetIndex] = useState(-1);
-    const snapPoints = useMemo(() => [height * 0.6], []);
-    const [modalState, setModalState] = useState('Create');
+    const snapPoints = useMemo(() => ['65%'], []); 
 
-    const handleOpenModal = () => {
-        bottomSheetRef.current?.present();
-    }
-
-    const handleCloseModal = () => {
-        bottomSheetRef.current?.dismiss();
-        clearModal();
-    }
-
-    const clearModal = () => {
-        setModalState('Create');
-        setBatimento(-1);
-        setBpm('');
-        setCondicao('');
-        setObservacoes('');
-
-        atual = new Date();
-
-        setHorario({
-            hora: atual.getHours(),
-            minuto: atual.getMinutes(),
-        });
-
-        setData({
-            dia: atual.getDate(),
-            mes: atual.getMonth() + 1,
-            ano: atual.getFullYear(),
-        });
-    }
-
-    const handleUpdateInfoModal = (id, bpm, condicao, hora, data, observacoes) => {
-        setModalState('Edit');
-        setBatimento(id);
-        setBpm(bpm.toString());
-        setCondicao(condicao);
-        setObservacoes(observacoes);
-
-        const h = hora.substring(0, 2);
-        const m = hora.substring(3, 5);
-
-        setHorario({
-            hora: h,
-            minuto: m,
-        });
-
-        const d = data.substring(0, 2);
-        const me = data.substring(3, 5);
-        const a = data.substring(6, 10);
-
-        setData({
-            dia: d,
-            mes: me,
-            ano: a,
-        });
-
-        handleOpenModal();
-    }
+    const [modalState, setModalState] = useState(null); 
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [periodo, setPeriodo] = useState('7d');
-    const [batimento, setBatimento] = useState(-1);
+
     const [bpm, setBpm] = useState('');
-    const [condicao, setCondicao] = useState('');
+    const [condicao, setCondicao] = useState(''); 
     const [observacoes, setObservacoes] = useState('');
+    
     const [horario, setHorario] = useState({
         hora: atual.getHours(),
         minuto: atual.getMinutes(),
     });
+
     const [data, setData] = useState({
         dia: atual.getDate(),
         mes: atual.getMonth() + 1,
         ano: atual.getFullYear(),
     });
 
+    const handleSheetChanges = useCallback((index) => {
+        setSheetIndex(index);
+        if (index === -1) {
+            clearModal();
+        }
+    }, []);
+
+    const clearModal = () => {
+        setModalState(null);
+        setSelectedItem(null);
+        resetForm();
+        setIsSaving(false);
+        setIsDeleting(false);
+    }
+
+    const resetForm = () => {
+        atual = new Date();
+        setBpm('');
+        setCondicao('');
+        setObservacoes('');
+        
+        setHorario({ 
+            hora: atual.getHours(), 
+            minuto: atual.getMinutes() 
+        });
+        
+        setData({ 
+            dia: atual.getDate(), 
+            mes: atual.getMonth() + 1, 
+            ano: atual.getFullYear() 
+        });
+    }
+
+    const openCreate = () => {
+        resetForm();
+        setModalState('create');
+        bottomSheetRef.current?.present();
+    }
+
+    const openView = (item) => {
+        setSelectedItem(item);
+        setModalState('view');
+        
+        setBpm(item.bpm.toString());
+        setCondicao(item.condicao);
+        setObservacoes(item.observacoes || '');
+        
+        try {
+            if (item.data) {
+                const parts = item.data.split(/[-/]/); 
+                if (parts.length === 3) {
+                    setData({
+                        dia: parts[0],
+                        mes: parts[1],
+                        ano: parts[2]
+                    });
+                }
+            }
+
+            if (item.hora) {
+                const timeParts = item.hora.split(':');
+                if (timeParts.length >= 2) {
+                    setHorario({
+                        hora: timeParts[0],
+                        minuto: timeParts[1]
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao parsear data:", e);
+        }
+
+        bottomSheetRef.current?.present();
+    }
+
+    const openEdit = () => setModalState('edit');
+    const openDelete = () => setModalState('delete');
+
+    const handleCloseModal = () => {
+        bottomSheetRef.current?.dismiss();
+        clearModal();
+    }
+
     const handleChangeData = (key, value) => {
-        setData(prev => ({
-            ...prev,
-            [key]: value,
-        }));
+        setData(prev => ({ ...prev, [key]: value }));
     };
 
     const handleChangeHorario = (key, value) => {
-        setHorario(prev => ({
-            ...prev,
-            [key]: value,
-        }));
+        setHorario(prev => ({ ...prev, [key]: value }));
     };
 
-    const handleSaveMedition = async () => {
+    const handleSave = async () => {
+        if (!bpm || !condicao) return; 
+
+        setIsSaving(true);
+        
         const bpmInt = Number(bpm);
         const pad = (num) => String(num).padStart(2, '0');
+        
         const dataFormatada = `${data.ano}-${pad(data.mes)}-${pad(data.dia)}`;
         const horaFormatada = `${pad(horario.hora)}:${pad(horario.minuto)}:00`;
         const dataHoraMedicao = `${dataFormatada} ${horaFormatada}`;
 
-        const dataNovoBatimento = {
+        const payload = {
             bpm: bpmInt,
             condicao: condicao,
             data_hora_medicao: dataHoraMedicao,
@@ -170,56 +221,331 @@ const Batimentos = () => {
         };
 
         try {
-            await api.post('/batimentos', dataNovoBatimento);
-            handleCloseModal();
+            if (modalState === 'create') {
+                await api.post('/batimentos', payload);
+            } else if (modalState === 'edit' && selectedItem) {
+                await api.put(`/batimentos/${selectedItem.id}`, payload);
+            }
+            
+            bottomSheetRef.current?.dismiss(); 
             fetchUserHistory();
             fetchUserCards();
-        } catch(e) {
-            console.error('Ocorreu um erro ao salvar', e);
+        } catch (e) {
+            console.error('Erro ao salvar batimento:', e);
+            Alert.alert("Erro", "Não foi possível salvar.");
+        } finally {
+            setIsSaving(false);
         }
     }
 
-    const handleUpdateMedition = async () => {
-        const bpmInt = Number(bpm);
-        const pad = (num) => String(num).padStart(2, '0');
-        const dataFormatada = `${data.ano}-${pad(data.mes)}-${pad(data.dia)}`;
-        const horaFormatada = `${pad(horario.hora)}:${pad(horario.minuto)}:00`;
-        const dataHoraMedicao = `${dataFormatada} ${horaFormatada}`;
-
-        const dataNovoBatimento = {
-            bpm: bpmInt,
-            condicao: condicao,
-            data_hora_medicao: dataHoraMedicao,
-            observacoes: observacoes.trim() ? observacoes.trim() : null,
-        };
-
+    const handleDelete = async () => {
+        if (!selectedItem) return;
+        
+        setIsDeleting(true);
+        
         try {
-            await api.put('/batimentos/' + batimento, dataNovoBatimento);
-            handleCloseModal();
+            await api.delete(`/batimentos/${selectedItem.id}`);
+            bottomSheetRef.current?.dismiss();
             fetchUserHistory();
-        } catch(e) {
-            console.error('Ocorreu um erro ao salvar', e);
+            fetchUserCards();
+        } catch (e) {
+            console.error('Erro ao deletar:', e);
+            Alert.alert("Erro", "Não foi possível remover.");
+        } finally {
+            setIsDeleting(false);
         }
     }
 
-    const helperSave = () => {
-        if (modalState === 'Create') {
-            handleSaveMedition();
-        } else {
-            handleUpdateMedition();
+    const renderModalContent = () => {
+        if (modalState === 'view' && selectedItem) {
+            return (
+                <View style={{ width: '100%', gap: 0.0222 * height }}>
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <FontAwesome name="heart" size={48} color={getHeartColor(selectedItem.bpm)} />
+                        
+                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 10 * scale, color: getHeartColor(selectedItem.bpm), marginTop: 5 }}>
+                            {selectedItem.bpm} BPM
+                        </Text>
+                        
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>
+                            {getCondicao(selectedItem.condicao)}
+                        </Text>
+                        
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#999' }}>
+                            {selectedItem.data} às {selectedItem.hora}
+                        </Text>
+                    </View>
+
+                    {selectedItem.observacoes && (
+                        <View style={{ backgroundColor: '#F5F7FB', padding: 15, borderRadius: 10 }}>
+                            <Text style={{ fontFamily: 'Poppins-SB', fontSize: 6 * scale, color: '#6C83A1' }}>Observações:</Text>
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#666' }}>{selectedItem.observacoes}</Text>
+                        </View>
+                    )}
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, marginTop: 10 }}>
+                        <Pressable 
+                            style={[styles.saveBtn, { flex: 1, backgroundColor: '#6C83A1', flexDirection: 'row', gap: 8 }]} 
+                            onPress={openEdit}
+                        >
+                            <AntDesign name="edit" size={18} color="#fff" />
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Editar</Text>
+                        </Pressable>
+
+                        <Pressable 
+                            style={[styles.saveBtn, { flex: 1, backgroundColor: '#e11d48', flexDirection: 'row', gap: 8 }]} 
+                            onPress={openDelete}
+                        >
+                            <AntDesign name="delete" size={18} color="#fff" />
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Excluir</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            );
         }
+
+        if (modalState === 'delete' && selectedItem) {
+            return (
+                <View style={{ width: '100%', gap: 20, alignItems: 'center' }}>
+                    <AntDesign name="warning" size={40} color="#e11d48" />
+                    
+                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1', textAlign: 'center' }}>
+                        Confirmar exclusão?
+                    </Text>
+                    
+                    <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+                        <Pressable 
+                            style={[styles.saveBtn, { flex: 1, backgroundColor: '#ccc' }]} 
+                            onPress={() => setModalState('view')} 
+                            disabled={isDeleting}
+                        >
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Cancelar</Text>
+                        </Pressable>
+                        
+                        <Pressable 
+                            style={[styles.saveBtn, { flex: 1, backgroundColor: '#e11d48' }]} 
+                            onPress={handleDelete} 
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? <ActivityIndicator color="#fff" /> : 
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Confirmar</Text>}
+                        </Pressable>
+                    </View>
+                </View>
+            );
+        }
+
+        if (modalState === 'create' || modalState === 'edit') {
+            return (
+                <View style={{ width: '100%', gap: 0.0444 * width }}>
+                    
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>
+                            Batimentos (BPM)
+                        </Text>
+                        <BottomSheetTextInput 
+                            style={{
+                                width: '100%',
+                                height: 0.05 * height,
+                                padding: 0.008 * height,
+                                fontFamily: 'Poppins-M',
+                                fontSize: 7 * scale,
+                                lineHeight: 7.7 * scale,
+                                backgroundColor: '#fff',
+                                borderColor: '#eee',
+                                borderWidth: 0.002 * height,
+                                borderRadius: 0.01 * height,
+                                color: '#6C83A1',
+                            }} 
+                            keyboardType='numeric' 
+                            maxLength={4} 
+                            onChangeText={setBpm} 
+                            value={bpm}
+                            placeholder="000"
+                        />
+                    </View>
+
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Data</Text>
+                        <View style={styles.modalDateInput}>
+                            <BottomSheetTextInput 
+                                style={{
+                                    width: '15%',
+                                    height: 0.05 * height,
+                                    padding: 0.008 * height,
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    lineHeight: 7.7 * scale,
+                                    backgroundColor: '#fff',
+                                    borderColor: '#eee',
+                                    borderWidth: 0.002 * height,
+                                    borderRadius: 0.01 * height,
+                                    color: '#6C83A1',
+                                    textAlign: 'center'
+                                }} 
+                                keyboardType='numeric' 
+                                maxLength={2} 
+                                onChangeText={(t) => handleChangeData('dia', t)} 
+                                value={data.dia.toString()} 
+                            />
+                            
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>/</Text>
+                            
+                            <BottomSheetTextInput 
+                                style={{
+                                    width: '15%',
+                                    height: 0.05 * height,
+                                    padding: 0.008 * height,
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    lineHeight: 7.7 * scale,
+                                    backgroundColor: '#fff',
+                                    borderColor: '#eee',
+                                    borderWidth: 0.002 * height,
+                                    borderRadius: 0.01 * height,
+                                    color: '#6C83A1',
+                                    textAlign: 'center'
+                                }} 
+                                keyboardType='numeric' 
+                                maxLength={2} 
+                                onChangeText={(t) => handleChangeData('mes', t)} 
+                                value={data.mes.toString()} 
+                            />
+                            
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>/</Text>
+                            
+                            <BottomSheetTextInput 
+                                style={{
+                                    width: '20%',
+                                    height: 0.05 * height,
+                                    padding: 0.008 * height,
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    lineHeight: 7.7 * scale,
+                                    backgroundColor: '#fff',
+                                    borderColor: '#eee',
+                                    borderWidth: 0.002 * height,
+                                    borderRadius: 0.01 * height,
+                                    color: '#6C83A1',
+                                    textAlign: 'center'
+                                }} 
+                                keyboardType='numeric' 
+                                maxLength={4} 
+                                onChangeText={(t) => handleChangeData('ano', t)} 
+                                value={data.ano.toString()} 
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Hora</Text>
+                        <View style={styles.modalTimeInput}>
+                            <BottomSheetTextInput 
+                                style={{
+                                    width: '15%',
+                                    height: 0.05 * height,
+                                    padding: 0.008 * height,
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    lineHeight: 7.7 * scale,
+                                    backgroundColor: '#fff',
+                                    borderColor: '#eee',
+                                    borderWidth: 0.002 * height,
+                                    borderRadius: 0.01 * height,
+                                    color: '#6C83A1',
+                                    textAlign: 'center'
+                                }} 
+                                keyboardType='numeric' 
+                                maxLength={2} 
+                                onChangeText={(t) => handleChangeHorario('hora', t)} 
+                                value={horario.hora.toString()} 
+                            />
+                            
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>:</Text>
+                            
+                            <BottomSheetTextInput 
+                                style={{
+                                    width: '15%',
+                                    height: 0.05 * height,
+                                    padding: 0.008 * height,
+                                    fontFamily: 'Poppins-M',
+                                    fontSize: 7 * scale,
+                                    lineHeight: 7.7 * scale,
+                                    backgroundColor: '#fff',
+                                    borderColor: '#eee',
+                                    borderWidth: 0.002 * height,
+                                    borderRadius: 0.01 * height,
+                                    color: '#6C83A1',
+                                    textAlign: 'center'
+                                }} 
+                                keyboardType='numeric' 
+                                maxLength={2} 
+                                onChangeText={(t) => handleChangeHorario('minuto', t)} 
+                                value={horario.minuto.toString()} 
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Condição</Text>
+                        <View style={styles.modalChipInput}>
+                            {['repouso', 'pos_exercicio', 'monitoramento', 'aleatorio'].map((tipo) => (
+                                <Pressable 
+                                    key={tipo}
+                                    style={[styles.modalChipInputOption, condicao === tipo && { backgroundColor: '#6C83A1' }]} 
+                                    onPress={() => setCondicao(tipo)}
+                                >
+                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: condicao === tipo ? '#fff' : '#6C83A1', lineHeight: 8 * scale }}>
+                                        {getCondicao(tipo)}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1', lineHeight: 7.7 * scale }}>Observações</Text>
+                        <BottomSheetTextInput 
+                            style={{
+                                width: '100%',
+                                height: 0.15 * height,
+                                padding: 0.008 * height,
+                                fontFamily: 'Poppins-M',
+                                fontSize: 7 * scale,
+                                lineHeight: 7.7 * scale,
+                                backgroundColor: '#fff',
+                                borderColor: '#eee',
+                                borderWidth: 0.002 * height,
+                                borderRadius: 0.01 * height,
+                                color: '#6C83A1',
+                                textAlignVertical: 'top',
+                            }} 
+                            multiline={true} 
+                            onChangeText={setObservacoes} 
+                            value={observacoes}
+                        />
+                    </View>
+
+                    <Pressable style={styles.saveBtn} onPress={handleSave} disabled={isSaving}>
+                        {isSaving ? <ActivityIndicator color="#fff" /> : 
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#fff', lineHeight: 9 * scale }}>
+                            {modalState === 'create' ? 'Salvar' : 'Atualizar'}
+                        </Text>}
+                    </Pressable>
+                    <View style={{ height: 20 }} />
+                </View>
+            );
+        }
+        return null;
     }
 
-    const handleSheetChanges = useCallback((index) => {
-        if (sheetIndex >= 0 && index === -1) {
-            dismissModal();
-        }
-        setSheetIndex(index);
-    }, [sheetIndex]);
-
-    const dismissModal = () => {
-        clearModal();
-    }
+    const renderModalTitle = () => {
+        if (modalState === 'create') return 'Adicionar medição';
+        if (modalState === 'edit') return 'Editar medição';
+        if (modalState === 'view') return 'Detalhes';
+        if (modalState === 'delete') return 'Excluir medição';
+        return '';
+    };
 
     const [cards, setCards] = useState({});
     const [isLoadingCards, setIsLoadingCards] = useState(true);
@@ -242,9 +568,8 @@ const Batimentos = () => {
         try {
             const res = await api.get(`/usuario/${usuario.id}/batimentos-por-periodo?periodo=${periodo}`); 
             setHistory(res.data.historico);
-            console.log(res.data.historico);
         } catch(e) {
-            console.error('Ocorreu um erro!', e);
+            console.error('Ocorreu um erro ao buscar histórico!', e);
         } finally {
             setIsLoadingHistory(false);
         }
@@ -275,20 +600,10 @@ const Batimentos = () => {
                         </Pressable>
                     </View>
 
-                    <Text style={{
-                        fontFamily: 'Poppins-M',
-                        fontSize: 13 * scale,
-                        color: '#6C83A1',
-                        lineHeight: 17 * scale
-                    }}>Batimentos</Text>
+                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 13 * scale, color: '#6C83A1', lineHeight: 17 * scale }}>Batimentos</Text>
 
                     <View style={styles.headerSection}>
-                        <Text style={{
-                            fontFamily: 'Poppins-M',
-                            fontSize: 9 * scale,
-                            color: '#6C83A1',
-                            lineHeight: 9.9 * scale
-                        }}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 9 * scale, color: '#6C83A1', lineHeight: 9.9 * scale }}>
                             Histórico
                         </Text>
 
@@ -386,382 +701,108 @@ const Batimentos = () => {
 
                     <View style={styles.history}>
                         <View style={styles.historyOptions}>
-                            <Pressable style={[styles.historyOption, periodo === '24h' && { backgroundColor: '#6C83A1' }]} onPress={() => setPeriodo('24h')}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: periodo === '24h' ? '#fff' : '#6C83A1',
-                                    lineHeight: 10 * scale
-                                }}>24h</Text>
-                            </Pressable>
-
-                            <Pressable style={[styles.historyOption, periodo === '7d' && { backgroundColor: '#6C83A1' }]} onPress={() => setPeriodo('7d')}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: periodo === '7d' ? '#fff' : '#6C83A1',
-                                    lineHeight: 10 * scale
-                                }}>7d</Text>
-                            </Pressable>
-
-                            <Pressable style={[styles.historyOption, periodo === '30d' && { backgroundColor: '#6C83A1' }]} onPress={() => setPeriodo('30d')}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: periodo === '30d' ? '#fff' : '#6C83A1',
-                                    lineHeight: 10 * scale
-                                }}>30d</Text>
-                            </Pressable>
-
-                            <Pressable style={[styles.historyOption, periodo === '365d' && { backgroundColor: '#6C83A1' }]} onPress={() => setPeriodo('365d')}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: periodo === '365d' ? '#fff' : '#6C83A1',
-                                    lineHeight: 10 * scale
-                                }}>365d</Text>
-                            </Pressable>
+                            {['24h', '7d', '30d', '365d'].map(p => (
+                                <Pressable key={p} style={[styles.historyOption, periodo === p && { backgroundColor: '#6C83A1' }]} onPress={() => setPeriodo(p)}>
+                                    <Text style={{
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 7 * scale,
+                                        color: periodo === p ? '#fff' : '#6C83A1',
+                                        lineHeight: 10 * scale
+                                    }}>{p}</Text>
+                                </Pressable>
+                            ))}
                         </View>
 
-                        {
-                            isLoadingHistory ? (
-                                <View style={{
-                                    flex: 1,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}>
-                                    <ActivityIndicator color='#6C83A1' size="large" />
-                                </View>
-                            ) : (
-                                <SectionList
-                                    sections={history}
-                                    keyExtractor={(item, index) => item + index}
-                                    renderItem={({item}) => (
-                                        <View style={styles.historyItem}>
-                                            <View style={styles.historyItemInfoContainer}>
-                                                <FontAwesome name="heart" size={32} color={getHeartColor(item.bpm)} />
+                        {isLoadingHistory ? (
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                <ActivityIndicator color='#6C83A1' size="large" />
+                            </View>
+                        ) : (
+                            <SectionList
+                                sections={history}
+                                keyExtractor={(item, index) => item + index}
+                                renderItem={({item}) => (
+                                    <View style={styles.historyItem}>
+                                        <View style={styles.historyItemInfoContainer}>
+                                            <FontAwesome name="heart" size={32} color={getHeartColor(item.bpm)} />
 
-                                                <View style={styles.historyItemInfo}>
-                                                    <Text style={{
-                                                        fontFamily: 'Poppins-M',
-                                                        fontSize: 7 * scale,
-                                                        color: getHeartColor(item.bpm),
-                                                        lineHeight: 10 * scale
-                                                    }}>{item.bpm}BPM</Text>
+                                            <View style={styles.historyItemInfo}>
+                                                <Text style={{
+                                                    fontFamily: 'Poppins-M',
+                                                    fontSize: 7 * scale,
+                                                    color: getHeartColor(item.bpm),
+                                                    lineHeight: 10 * scale
+                                                }}>{item.bpm}BPM</Text>
 
-                                                    <Text style={{
-                                                        fontFamily: 'Poppins-M',
-                                                        fontSize: 6 * scale,
-                                                        color: '#00000030',
-                                                        lineHeight: 9 * scale
-                                                    }}>{getCondicao(item.condicao)} - {item.hora}</Text>
-                                                </View>
+                                                <Text style={{
+                                                    fontFamily: 'Poppins-M',
+                                                    fontSize: 6 * scale,
+                                                    color: '#00000030',
+                                                    lineHeight: 9 * scale
+                                                }}>{getCondicao(item.condicao)} - {item.hora}</Text>
                                             </View>
-
-                                            <Pressable onPress={() => handleUpdateInfoModal(item.id, item.bpm, item.condicao, item.hora, item.data, item.observacoes)}>
-                                                <Entypo name="chevron-right" size={24} color="#00000030" />
-                                            </Pressable>
                                         </View>
-                                    )}
-                                    ItemSeparatorComponent={() => (
-                                        <View style={{
-                                            width: '100%',
-                                            height: 0.0444 * width,
-                                        }}></View>
-                                    )}
-                                    renderSectionHeader={({ section }) => {
-                                        const sectionIndex = history.indexOf(section);
-                                        const isFirst = sectionIndex === 0;
-                                        const isLast = sectionIndex === history.length - 1;
 
-                                        let headerStyles = {
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 8 * scale,
-                                            color: '#6C83A1',
-                                            lineHeight: 11 * scale,
-                                            paddingBottom: 0,
-                                            paddingTop: 0,
-                                        };
+                                        <Pressable onPress={() => openView(item)}>
+                                            <Entypo name="chevron-right" size={24} color="#00000030" />
+                                        </Pressable>
+                                    </View>
+                                )}
+                                ItemSeparatorComponent={() => (
+                                    <View style={{ width: '100%', height: 0.0444 * width }}></View>
+                                )}
+                                renderSectionHeader={({ section }) => {
+                                    const sectionIndex = history.indexOf(section);
+                                    const isFirst = sectionIndex === 0;
+                                    const isLast = sectionIndex === history.length - 1;
 
-                                        if (isFirst) {
-                                            headerStyles.paddingBottom = PADDING_BOTTOM;
-                                            headerStyles.paddingTop = 0;
-                                        } else if (isLast) {
-                                            headerStyles.paddingTop = PADDING_VERTICAL;
-                                            headerStyles.paddingBottom = 0;
-                                        } else {
-                                            headerStyles.paddingTop = PADDING_VERTICAL;
-                                            headerStyles.paddingBottom = PADDING_BOTTOM;
-                                        }
+                                    let headerStyles = {
+                                        fontFamily: 'Poppins-M',
+                                        fontSize: 8 * scale,
+                                        color: '#6C83A1',
+                                        lineHeight: 11 * scale,
+                                        paddingBottom: 0,
+                                        paddingTop: 0,
+                                    };
 
-                                        return (
-                                            <Text style={headerStyles}>
-                                                {section.title} (Média: {Math.round(section.media_bpm)}BPM)
-                                            </Text>
-                                        );
-                                    }}
-                                />
-                            )
-                        }
+                                    if (isFirst) { headerStyles.paddingBottom = PADDING_BOTTOM; headerStyles.paddingTop = 0; }
+                                    else if (isLast) { headerStyles.paddingTop = PADDING_VERTICAL; headerStyles.paddingBottom = 0; }
+                                    else { headerStyles.paddingTop = PADDING_VERTICAL; headerStyles.paddingBottom = PADDING_BOTTOM; }
+
+                                    return (
+                                        <Text style={headerStyles}>
+                                            {section.title} (Média: {Math.round(section.media_bpm)}BPM)
+                                        </Text>
+                                    );
+                                }}
+                            />
+                        )}
                     </View>
 
-                    <Pressable style={styles.fab} onPress={handleOpenModal}>
+                    <Pressable style={styles.fab} onPress={openCreate}>
                         <Entypo name="plus" size={24} color="#fff" />
                     </Pressable>
                 </View>
 
-                <BottomSheetModal ref={bottomSheetRef} snapPoints={snapPoints} enablePanDownToClose={true} backgroundStyle={{ backgroundColor: '#fff' }} style={{
-                    padding: 0.0444 * width,
-                    zIndex: 1000,
-                    position: 'relative',
-                }} handleIndicatorStyle={{
-                    backgroundColor: '#6C83A1'
-                }} onChange={handleSheetChanges}>
+                <BottomSheetModal 
+                    ref={bottomSheetRef} 
+                    snapPoints={snapPoints} 
+                    enablePanDownToClose={true} 
+                    backgroundStyle={{ backgroundColor: '#fff' }} 
+                    style={{ padding: 0.0444 * width, zIndex: 1000, position: 'relative' }} 
+                    handleIndicatorStyle={{ backgroundColor: '#6C83A1' }} 
+                    onChange={handleSheetChanges}
+                >
                     <BottomSheetScrollView style={{ flex: 1 }} contentContainerStyle={{ alignItems: 'center', gap: 0.0444 * width }}>
-                        <Text style={{
-                            fontFamily: 'Poppins-M',
-                            fontSize: 9 * scale,
-                            color: '#6C83A1',
-                            lineHeight: 12 * scale
-                        }}>Adicionar medição</Text>
-
-                        <View style={styles.modalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale
-                            }}>
-                                Batimentos (BPM)
-                            </Text>
-
-                            <BottomSheetTextInput style={{
-                                width: '100%',
-                                height: 0.05 * height,
-                                padding: 0.008 * height,
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                lineHeight: 7.7 * scale,
-                                backgroundColor: '#fff',
-                                borderColor: '#eee',
-                                borderWidth: 0.002 * height,
-                                borderRadius: 0.01 * height,
-                                color: '#6C83A1',
-                            }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false} onChangeText={setBpm} value={bpm}></BottomSheetTextInput>
-                        </View>
-
-                        <View style={styles.modalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Data</Text>
-
-                            <View style={styles.modalDateInput}>
-                                <BottomSheetTextInput style={{
-                                    width: '15%',
-                                    height: 0.05 * height,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    lineHeight: 7.7 * scale,
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                    textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeData('dia', text)} value={data.dia.toString()}></BottomSheetTextInput>
-
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: '#6C83A1',
-                                    lineHeight: 7.7 * scale 
-                                }}>/</Text>
-
-                                <BottomSheetTextInput style={{
-                                    width: '15%',
-                                    height: 0.05 * height,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    lineHeight: 7.7 * scale,
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                    textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeData('mes', text)} value={data.mes.toString()}></BottomSheetTextInput>
-
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: '#6C83A1',
-                                    lineHeight: 7.7 * scale 
-                                }}>/</Text>
-
-                                <BottomSheetTextInput style={{
-                                    width: '20%',
-                                    height: 0.05 * height,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    lineHeight: 7.7 * scale,
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                    textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeData('ano', text)} value={data.ano.toString()}></BottomSheetTextInput>
-                            </View>
-                        </View>
-
-                        <View style={styles.modalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Hora</Text>
-
-                            <View style={styles.modalTimeInput}>
-                                <BottomSheetTextInput style={{
-                                    width: '15%',
-                                    height: 0.05 * height,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    lineHeight: 7.7 * scale,
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                    textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeHorario('hora', text)} value={horario.hora.toString()}></BottomSheetTextInput>
-
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    color: '#6C83A1',
-                                    lineHeight: 7.7 * scale 
-                                }}>:</Text>
-
-                                <BottomSheetTextInput style={{
-                                    width: '15%',
-                                    height: 0.05 * height,
-                                    padding: 0.008 * height,
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 7 * scale,
-                                    lineHeight: 7.7 * scale,
-                                    backgroundColor: '#fff',
-                                    borderColor: '#eee',
-                                    borderWidth: 0.002 * height,
-                                    borderRadius: 0.01 * height,
-                                    color: '#6C83A1',
-                                    textAlign: 'center'
-                                }} keyboardType='numeric' maxLength={4} scrollEnabled={false} multiline={false}onChangeText={(text) => handleChangeData('minuto', text)} value={horario.minuto.toString()}></BottomSheetTextInput>
-                            </View>
-                        </View>
-
-                        <View style={styles.modalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>Condição</Text>
-
-                            <View style={styles.modalChipInput}>
-                                <Pressable style={[styles.modalChipInputOption, condicao === 'repouso' && { backgroundColor: '#6C83A1' }]} onPress={() => setCondicao('repouso')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: condicao === 'repouso' ? '#fff' : '#6C83A1',
-                                        lineHeight: 8 * scale 
-                                    }}>Em repouso</Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.modalChipInputOption, condicao === 'pos_exercicio' && { backgroundColor: '#6C83A1' }]} onPress={() => setCondicao('pos_exercicio')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: condicao === 'pos_exercicio' ? '#fff' : '#6C83A1',
-                                        lineHeight: 8 * scale 
-                                    }}>Pós-exercício</Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.modalChipInputOption, condicao === 'monitoramento' && { backgroundColor: '#6C83A1' }]} onPress={() => setCondicao('monitoramento')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: condicao === 'monitoramento' ? '#fff' : '#6C83A1',
-                                        lineHeight: 8 * scale 
-                                    }}>Monitoramento</Text>
-                                </Pressable>
-
-                                <Pressable style={[styles.modalChipInputOption, condicao === 'aleatorio' && { backgroundColor: '#6C83A1' }]} onPress={() => setCondicao('aleatorio')}>
-                                    <Text style={{
-                                        fontFamily: 'Poppins-M',
-                                        fontSize: 6 * scale,
-                                        color: condicao === 'aleatorio' ? '#fff' : '#6C83A1',
-                                        lineHeight: 8 * scale 
-                                    }}>Aleatório</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-
-                        <View style={styles.modalInput}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                color: '#6C83A1',
-                                lineHeight: 7.7 * scale 
-                            }}>
-                                Observações
-                            </Text>
-
-                            <BottomSheetTextInput style={{
-                                width: '100%',
-                                height: 0.15 * height,
-                                padding: 0.008 * height,
-                                fontFamily: 'Poppins-M',
-                                fontSize: 7 * scale,
-                                lineHeight: 7.7 * scale,
-                                backgroundColor: '#fff',
-                                borderColor: '#eee',
-                                borderWidth: 0.002 * height,
-                                borderRadius: 0.01 * height,
-                                color: '#6C83A1',
-                                textAlignVertical: 'top',
-                            }} scrollEnabled={false} multiline={true} onChangeText={setObservacoes} value={observacoes}></BottomSheetTextInput>
-                        </View>
-
-                        <Pressable style={styles.saveBtn} onPress={() => helperSave()}>
-                            <Text style={{
-                                fontFamily: 'Poppins-M',
-                                fontSize: 8 * scale,
-                                color: '#fff',
-                                lineHeight: 9 * scale
-                            }}>
-                                Salvar
-                            </Text>
-                        </Pressable>
-
-                        <View style={{
-                            width: '100%',
-                            height: 0.0444 * width,
-                        }}></View>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 9 * scale, color: '#6C83A1', lineHeight: 12 * scale }}>
+                            {renderModalTitle()}
+                        </Text>
+                        {renderModalContent()}
                     </BottomSheetScrollView>
                 </BottomSheetModal>
 
                 <BatimentoModalGrafico visible={graficoModalVisible} setVisible={setGraficoModalVisible} width={width} height={height} scale={scale}></BatimentoModalGrafico>
 
-                {/* Modal de Ajuda */}
                 <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                     <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                         <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

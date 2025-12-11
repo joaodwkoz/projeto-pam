@@ -7,67 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import { dynamicStyles } from './styles';
 
-const VACINAS = [
-    { title: 'Ao nascer (0 meses)', data: [
-        'BCG - Protege contra formas graves de tuberculose',
-        'Hepatite B - 1ª dose'
-    ]},
-    { title: '2 meses', data: [
-        'Pentavalente - 1ª dose',
-        'VIP - Poliomielite inativada - 1ª dose',
-        'Pneumocócica 10 - 1ª dose',
-        'Rotavírus - 1ª dose'
-    ]},
-    { title: '4 meses', data: [
-        'Pentavalente - 2ª dose',
-        'VIP - 2ª dose',
-        'Pneumocócica 10 - 2ª dose',
-        'Rotavírus - 2ª dose'
-    ]},
-    { title: '6 meses', data: [
-        'Pentavalente - 3ª dose',
-        'VIP - 3ª dose',
-        'Meningocócica C - 1ª dose'
-    ]},
-    { title: '9 meses', data: [
-        'Febre Amarela - 1ª dose'
-    ]},
-    { title: '1 ano', data: [
-        'Tríplice Viral - 1ª dose',
-        'Hepatite A - dose única',
-        'Pneumocócica 10 - Reforço',
-        'Meningocócica C - Reforço'
-    ]},
-    { title: '1 ano e 3 meses', data: [
-        'Tetra Viral - Reforço',
-        'DTP - Reforço'
-    ]},
-    { title: '4 anos', data: [
-        'DTP - 2º reforço',
-        'VOP - Poliomielite - reforço',
-        'Tríplice Viral - 2ª dose'
-    ]},
-    { title: '5 anos', data: [
-        'Varicela - dose adicional',
-        'Febre Amarela - reforço se necessário'
-    ]},
-    { title: '9 a 14 anos', data: [
-        'HPV - 2 doses para meninas',
-        'HPV - 2 doses para meninos'
-    ]},
-    { title: '11 a 14 anos', data: [
-        'Meningocócica ACWY - dose única'
-    ]},
-    { title: 'Aos 15 anos', data: [
-        'dT - Reforço a cada 10 anos',
-        'Hepatite B - caso não tenha tomado todas as doses'
-    ]},
-    { title: 'Gestantes', data: [
-        'dTpa - 1 dose a cada gestação',
-        'Hepatite B - esquema completo se não vacinada',
-        'Influenza - anual'
-    ]}
-];
+const VACINAS = [ { title: 'Ao nascer', data: [ 'BCG - Tuberculose', 'Hepatite B' ]}, { title: '2 meses', data: [ 'Pentavalente (1ª dose)', 'VIP - Poliomielite (1ª dose)', 'Pneumocócica 10V (1ª dose)', 'Rotavírus (1ª dose)' ]}, { title: '3 meses', data: [ 'Meningocócica C (1ª dose)' ]}, { title: '4 meses', data: [ 'Pentavalente (2ª dose)', 'VIP - Poliomielite (2ª dose)', 'Pneumocócica 10V (2ª dose)', 'Rotavírus (2ª dose)' ]}, { title: '5 meses', data: [ 'Meningocócica C (2ª dose)' ]}, { title: '6 meses', data: [ 'Pentavalente (3ª dose)', 'VIP - Poliomielite (3ª dose)', 'Influenza - Gripe (1ª dose - campanha)', 'Covid-19 (1ª dose)' ]}, { title: '7 meses', data: [ 'Influenza - Gripe (2ª dose - campanha)', 'Covid-19 (2ª dose)' ]}, { title: '9 meses', data: [ 'Febre Amarela (1ª dose)', 'Covid-19 (3ª dose)' ]}, { title: '12 meses (1 ano)', data: [ 'Tríplice Viral - Sarampo, Caxumba, Rubéola (1ª dose)', 'Pneumocócica 10V (Reforço)', 'Meningocócica C (Reforço)' ]}, { title: '15 meses (1 ano e 3 meses)', data: [ 'Hepatite A (Dose única)', 'Tetra Viral ou Tríplice Viral + Varicela', 'DTP - Tríplice Bacteriana (1º Reforço)', 'VOP - Poliomielite oral (1º Reforço)' ]}, { title: '4 anos', data: [ 'DTP - Tríplice Bacteriana (2º Reforço)', 'VOP - Poliomielite oral (2º Reforço)', 'Varicela (2ª dose)', 'Febre Amarela (Reforço)' ]}, { title: '9 a 14 anos', data: [ 'HPV (2 doses - Meninas e Meninos)' ]}, { title: '11 a 14 anos', data: [ 'Meningocócica ACWY (Dose única)' ]}, { title: '10 a 19 anos (Adolescente)', data: [ 'Hepatite B (3 doses - se não vacinado)', 'Febre Amarela (se não vacinado)', 'Tríplice Viral (2 doses - se não vacinado)', 'dT - Dupla adulto (Reforço a cada 10 anos)' ]}, { title: '20 a 59 anos (Adulto)', data: [ 'Hepatite B (3 doses - se não vacinado)', 'dT - Dupla adulto (Reforço a cada 10 anos)', 'Febre Amarela (se não vacinado)', 'Tríplice Viral (Se não vacinado: 2 doses até 29 anos, 1 dose de 30 a 59)' ]}, { title: '60 anos ou mais (Idoso)', data: [ 'Influenza (Anual)', 'dT - Dupla adulto (Reforço a cada 10 anos)', 'Hepatite B (se não vacinado)', 'Pneumocócica 23V (Acamados ou em instituições)' ]}, { title: 'Gestantes', data: [ 'dTpa (A partir da 20ª semana - a cada gestação)', 'Hepatite B (3 doses - se não vacinada)', 'dT - Dupla adulto (Se esquema incompleto)', 'Influenza (Anual)' ]} ];
 
 const Vacinas = () => {
     const { width, height } = useWindowDimensions();
@@ -75,7 +15,6 @@ const Vacinas = () => {
     const styles = dynamicStyles(width, height);
     const navigation = useNavigation();
 
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const [fontsLoaded] = useFonts({
@@ -162,8 +101,7 @@ const Vacinas = () => {
                     <View style={{ height: 0.0222 * width }} />
                 )}
             />
-
-            {/* Modal de Ajuda */}
+            
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

@@ -27,7 +27,6 @@ StyleSheet.create({
         backgroundColor: '#fff',
     },
 
-    // --- Estilos do Modal de Ajuda ---
     modalBackdrop: {
         flex: 1,
         width: '100%',

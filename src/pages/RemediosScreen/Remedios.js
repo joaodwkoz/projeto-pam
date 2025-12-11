@@ -41,7 +41,6 @@ const Remedios = () => {
         { label: 'A cada 8 horas', valor: 8, notificacao: 'Padrão', cor: '#fff1a8', icon: 'clock-time-eight-outline' },
         { label: 'A cada 12 horas', valor: 12, notificacao: 'Moderada', cor: '#b0e3c7', icon: 'clock-time-twelve-outline' },
         { label: 'Uma vez ao dia', valor: 24, notificacao: 'Baixa', cor: '#a8d8ff', icon: 'calendar-clock' },
-        { label: 'Quando necessário (SOS)', valor: null, notificacao: 'Sem notificação', cor: '#cea8ff', icon: 'pill' }
     ];
 
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -551,7 +550,6 @@ const Remedios = () => {
                 </BlurView>
             </Modal>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.remedyModalContainer}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

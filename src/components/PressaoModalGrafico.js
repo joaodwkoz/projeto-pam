@@ -87,8 +87,7 @@ const PressaoModalGrafico = ({ visible, setVisible, width, height, scale = 3 }) 
                                         color: '#6C83A1',
                                     }}
                                 >
-                                    Visualizar dados de pressão
-                                </Text>
+                                    Visualizar dados</Text>
 
                                 <Pressable
                                     style={styles.closeModalBtn}
@@ -271,7 +270,7 @@ const dynamicStyles = (width, height) =>
         },
 
         filter: {
-            padding: 0.0222 * width,
+            padding: 0.0111 * width,
             backgroundColor: '#f0f0f0',
             borderRadius: 0.0125 * width,
         },

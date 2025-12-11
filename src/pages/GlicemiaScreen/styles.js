@@ -99,10 +99,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * width,
     },
 
-    historyItemInfo: {
-        // Estilos para o texto ao lado do ícone
-    },
-
     fab: {
         position: 'absolute',
         height: 0.06 * height,
@@ -192,7 +188,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.1 * width,
     },
 
-    // --- Estilos do Modal de Ajuda ---
     modalBackdrop: {
         flex: 1,
         width: '100%',
@@ -213,16 +208,5 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     helpSection: {
         width: '100%',
         gap: 0.01 * height,
-    },
-
-    modalBtn: {
-        flex: 1,
-        width: '100%',
-        maxHeight: 0.05 * height,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 0.0125 * width,
-        backgroundColor: '#f0f0f0',
-        marginTop: 0.0222 * height
     },
 });

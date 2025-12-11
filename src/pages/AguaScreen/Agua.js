@@ -1,4 +1,4 @@
-import { View, Pressable, Image, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Pressable, Image, Text, PixelRatio, useWindowDimensions, ActivityIndicator, Modal, TextInput, ScrollView, Alert, Vibration } from 'react-native';
 import Animated, {
   useSharedValue,
   withTiming,
@@ -152,7 +152,7 @@ const Agua = () => {
             const stored = await AsyncStorage.getItem(STORAGE_KEY_SETTINGS);
             if (stored) {
                 const settings = JSON.parse(stored);
-                if (settings.meta) setMetaMl(settings.meta);
+                if (settings.meta) setMetaMl(Number(settings.meta));
                 if (settings.notification) {
                     setNotifFreqIndex(settings.notification.index);
                     setNotifId(settings.notification.id);
@@ -181,7 +181,7 @@ const Agua = () => {
             setNotifId(newNotifId);
 
             const settingsToSave = {
-                meta: metaMl,
+                meta: Number(metaMl),
                 notification: {
                     index: notifFreqIndex,
                     id: newNotifId
@@ -231,14 +231,24 @@ const Agua = () => {
     const handleNewConsumo = useCallback(async (volume, idCopo) => {
       const data = { 'volume_ml': volume, 'usuario_id': usuario.id, 'copo_id': idCopo }
       try {
-        setTotalMl(prev => prev + volume);
+        setTotalMl(prev => {
+            const novoTotal = prev + Number(volume);
+            const meta = Number(metaMl);
+
+            if (novoTotal >= meta) {
+                Vibration.vibrate(500);
+            }
+
+            return novoTotal;
+        });
+        
         await api.post('/consumo', data);
         fetchConsumedCups(); 
       } catch (e) {
         console.error("Erro ao salvar consumo:", e);
-        setTotalMl(prev => prev - volume); 
+        setTotalMl(prev => prev - Number(volume)); 
       }
-    }, [usuario.id]);
+    }, [usuario.id, metaMl]);
 
     const clearCopoModal = () => {
       setModalCopoVisible(false);
@@ -318,7 +328,6 @@ const Agua = () => {
               </Pressable>
           </View>
 
-          {/* Menu Dropdown (Configurações / Ajuda) */}
           {mostrarMenuOpcoes && (
             <View style={styles.menuOptions}>
                 <Pressable style={styles.menuOption} onPress={() => {
@@ -384,10 +393,9 @@ const Agua = () => {
                     <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#ffffffff', lineHeight: 6.6 * scale }}>{c.capacidade_ml}</Text>
                   </View>
                 </View>  
-              ))}
+             ))}
           </ScrollView>
 
-          {/* Modal CRUD Copo */}
           <Modal visible={modalCopoVisible} transparent animationType='slide'>
             <View style={styles.modalContainer}>
               <View style={styles.modal}>
@@ -437,104 +445,102 @@ const Agua = () => {
             </View>
           </Modal>
 
-          {/* Modal de Configurações (Meta e Notificações) */}
           <Modal visible={modalConfigVisible} transparent animationType='slide'>
-                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
-                    <View style={styles.helpModal}>        
-                        <View style={styles.modalInput}>
-                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>Meta Diária (ml)</Text>
-                            <TextInput 
-                                style={styles.textInput} 
-                                keyboardType='numeric' 
-                                value={String(metaMl)} 
-                                onChangeText={(val) => setMetaMl(Number(val))} 
-                            />
-                        </View>
-
-                        <View style={[styles.modalInput, { zIndex: 200 }]}>
-                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>Notificações</Text>
-                            <Pressable style={styles.select} onPress={() => setMostrarOpcoesNotif(!mostrarOpcoesNotif)}>
-                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>
-                                    {NOTIF_OPTIONS[notifFreqIndex]?.label || "Selecione"}
-                                </Text>
-                                <Entypo name={mostrarOpcoesNotif ? "chevron-up" : "chevron-down"} size={16} color="#6C83A1" />
-                            </Pressable>
-                            
-                            {mostrarOpcoesNotif && (
-                                <View style={styles.optionsContainerUp}>
-                                    <ScrollView style={{ width: '100%', height: '100%' }} contentContainerStyle={{ gap: 0.01 * height }}>
-                                        {NOTIF_OPTIONS.map((opt, i) => (
-                                            <Pressable key={i} style={styles.option} onPress={() => { setNotifFreqIndex(i); setMostrarOpcoesNotif(false); }}>
-                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>{opt.label}</Text>
-                                            </Pressable>
-                                        ))}
-                                    </ScrollView>
-                                </View>
-                            )}
-                        </View>
-
-                        <View style={styles.actions}>
-                             <Pressable style={[styles.actionsBtn, { backgroundColor: '#f0f0f0' }]} onPress={() => setModalConfigVisible(false)}>
-                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>Cancelar</Text>
-                            </Pressable>
-                            <Pressable style={[styles.actionsBtn, { backgroundColor: '#6C83A1' }]} onPress={saveSettings}>
-                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#fff' }}>Salvar</Text>
-                            </Pressable>
-                        </View>
+            <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
+                <View style={styles.helpModal}>        
+                    <View style={styles.modalInput}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>Meta Diária (ml)</Text>
+                        <TextInput 
+                            style={styles.textInput} 
+                            keyboardType='numeric' 
+                            value={String(metaMl)} 
+                            onChangeText={(val) => setMetaMl(Number(val))} 
+                        />
                     </View>
-                </BlurView>
+
+                    <View style={[styles.modalInput, { zIndex: 200 }]}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>Notificações</Text>
+                        <Pressable style={styles.select} onPress={() => setMostrarOpcoesNotif(!mostrarOpcoesNotif)}>
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>
+                                {NOTIF_OPTIONS[notifFreqIndex]?.label || "Selecione"}
+                            </Text>
+                            <Entypo name={mostrarOpcoesNotif ? "chevron-up" : "chevron-down"} size={16} color="#6C83A1" />
+                        </Pressable>
+                        
+                        {mostrarOpcoesNotif && (
+                            <View style={styles.optionsContainerUp}>
+                                <ScrollView style={{ width: '100%', height: '100%' }} contentContainerStyle={{ gap: 0.01 * height }}>
+                                    {NOTIF_OPTIONS.map((opt, i) => (
+                                        <Pressable key={i} style={styles.option} onPress={() => { setNotifFreqIndex(i); setMostrarOpcoesNotif(false); }}>
+                                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>{opt.label}</Text>
+                                        </Pressable>
+                                    ))}
+                                </ScrollView>
+                            </View>
+                        )}
+                    </View>
+
+                    <View style={styles.actions}>
+                          <Pressable style={[styles.actionsBtn, { backgroundColor: '#f0f0f0' }]} onPress={() => setModalConfigVisible(false)}>
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1' }}>Cancelar</Text>
+                        </Pressable>
+                        <Pressable style={[styles.actionsBtn, { backgroundColor: '#6C83A1' }]} onPress={saveSettings}>
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#fff' }}>Salvar</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </BlurView>
           </Modal>
 
-          {/* Modal de Ajuda */}
           <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
-                <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
-                    <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
-                        <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+            <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
+                <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
+                    <Pressable style={styles.helpModal} onPress={(e) => e.stopPropagation()}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1' }}>Ajuda</Text>
+                        </View>
+
+                        <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
+                            <View style={styles.helpSection}>
+                                <Text style={{ fontFamily: 'Poppins-SB', fontSize: 9 * scale, color: '#6C83A1' }}>Água</Text>
                             </View>
 
-                            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 0.015 * height }} showsVerticalScrollIndicator={false}>
-                                <View style={styles.helpSection}>
-                                    <Text style={{ fontFamily: 'Poppins-SB', fontSize: 9 * scale, color: '#6C83A1' }}>Água</Text>
+                            <View style={styles.helpSection}>
+                                <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                    <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
+                                    <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Função:</Text>
                                 </View>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Registrar e monitorar consumo de água.</Text>
+                            </View>
 
-                                <View style={styles.helpSection}>
-                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
-                                        <Ionicons name="information-circle" size={0.05 * width} color="#6C83A1" />
-                                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Função:</Text>
-                                    </View>
-                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Registrar e monitorar consumo de água.</Text>
+                            <View style={styles.helpSection}>
+                                <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                    <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
+                                    <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Campos:</Text>
                                 </View>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Copos personalizados, meta diária.</Text>
+                            </View>
 
-                                <View style={styles.helpSection}>
-                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
-                                        <Ionicons name="list-circle" size={0.05 * width} color="#6C83A1" />
-                                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Campos:</Text>
-                                    </View>
-                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Copos personalizados, meta diária.</Text>
+                            <View style={styles.helpSection}>
+                                <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                    <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
+                                    <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Como usar:</Text>
                                 </View>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Toque no copo para registrar consumo.</Text>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Crie copos personalizados no botão "+".</Text>
+                            </View>
 
-                                <View style={styles.helpSection}>
-                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
-                                        <Ionicons name="play-circle" size={0.05 * width} color="#6C83A1" />
-                                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Como usar:</Text>
-                                    </View>
-                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Toque no copo para registrar consumo.</Text>
-                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Crie copos personalizados no botão "+".</Text>
+                            <View style={styles.helpSection}>
+                                <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
+                                    <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
+                                    <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Resultado esperado:</Text>
                                 </View>
-
-                                <View style={styles.helpSection}>
-                                    <View style={{flexDirection: 'row', gap: 0.0111 * width, alignItems: 'center'}}>
-                                        <Ionicons name="checkmark-circle" size={0.05 * width} color="#6C83A1" />
-                                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1' }}>Resultado esperado:</Text>
-                                    </View>
-                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Gráfico de hidratação e atingimento da meta.</Text>
-                                </View>
-                            </ScrollView>
-                        </Pressable>
+                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#8A9CB3' }}>Gráfico de hidratação e atingimento da meta.</Text>
+                            </View>
+                        </ScrollView>
                     </Pressable>
-                </BlurView>
+                </Pressable>
+            </BlurView>
           </Modal>
 
           <AguaModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} width={width} height={height} scale={scale}></AguaModalHistorico>

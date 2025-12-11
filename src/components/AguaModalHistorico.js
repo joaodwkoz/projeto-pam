@@ -1,434 +1,471 @@
 import { BlurView } from "expo-blur";
-import React, { useEffect, useState, useCallback, useContext } from "react";
-import { View, Image, Pressable, Modal, StyleSheet, Text, SectionList, ActivityIndicator } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolate,
-} from "react-native-reanimated";
+import React, { useEffect, useState, useCallback, useContext, useMemo } from "react";
+import { 
+    View, 
+    Image, 
+    Pressable, 
+    Modal, 
+    StyleSheet, 
+    Text, 
+    SectionList, 
+    ActivityIndicator 
+} from "react-native";
+
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { AuthContext } from "../contexts/AuthContext";
 import api from "../services/api";
 import { LineChart } from 'react-native-gifted-charts';
 
 import { BASE_URL_STORAGE } from "../constants/api";
 
+const STORAGE_KEY_SETTINGS = 'water_settings';
+
 const AguaModalHistorico = ({ visible, setVisible, width, height, scale = 3 }) => {
+    
     const { usuario } = useContext(AuthContext);
 
-    const PADDING_VERTICAL = React.useMemo(() => 0.0444 * width, [width]);
-    const PADDING_BOTTOM = React.useMemo(() => 0.0444 * width, [width]);
+    // --- Definição de Espaçamentos Dinâmicos ---
+    const S1 = 0.0111 * width; 
+    const S2 = 0.0222 * width;
+    const S4 = 0.0444 * width;
+    const RADIUS = 0.025 * width;
+    const ICON_SIZE = 0.065 * width;
 
-    const MODAL_VIEW_WIDTH = 0.82 * width;
-    const MODAL_PADDING = 0.0444 * width;
-    const CHART_CONTAINER_WIDTH = MODAL_VIEW_WIDTH - (2 * MODAL_PADDING);
-    const FINAL_CHART_WIDTH = CHART_CONTAINER_WIDTH - 20; 
-    const NUM_SPACES = 6; 
-    const FINAL_SPACING = FINAL_CHART_WIDTH / NUM_SPACES;
+    const MODAL_WIDTH = 0.82 * width;
+    const LABEL_WIDTH = 0.14 * width; 
+    const CHART_WIDTH = MODAL_WIDTH - (S4 * 2) - LABEL_WIDTH - S2; 
+    const CHART_HEIGHT = 0.25 * height;
 
-    const styles = React.useMemo(() => dynamicStyles(width, height), [width, height]);
+    const styles = useMemo(() => dynamicStyles(width, height, scale), [width, height, scale]);
 
+    // --- Estados ---
     const [periodo, setPeriodo] = useState('Semana');
     const [aba, setAba] = useState('Histórico');
-
+    const [viewMode, setViewMode] = useState('list'); 
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [history, setHistory] = useState(null);
     const [lineData, setLineData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [metaMl, setMetaMl] = useState(4000);
+
+    // --- Funções ---
+    const loadSettings = useCallback(async () => {
+        try {
+            const stored = await AsyncStorage.getItem(STORAGE_KEY_SETTINGS);
+            if (stored) {
+                const settings = JSON.parse(stored);
+                if (settings.meta) setMetaMl(settings.meta);
+            }
+        } catch (e) {
+            console.error("Erro config:", e);
+        }
+    }, []);
 
     const fetchHistory = useCallback(async () => {
         setIsLoading(true);
-
         try {
             const res = await api.get(`/usuario/${usuario.id}/consumos-por-periodo?periodo=${periodo.toLowerCase()}`); 
             setHistory(res.data.historico);
-            console.log(res.data.historico);
         } catch(e) {
-            console.error('Ocorreu um erro!', e);
+            console.error('Erro historico:', e);
         } finally {
             setIsLoading(false);
         }
     }, [usuario.id, periodo]);
 
     const fetchChart = useCallback(async () => {
-        setIsLoading(true);
-
         try {
             const res = await api.get(`/usuario/${usuario.id}/consumos-grafico?periodo=${periodo.toLowerCase()}`); 
             setLineData(res.data.dados_grafico);
-            console.log(res.data.dados_grafico);
         } catch(e) {
-            console.error('Ocorreu um erro!', e);
-        } finally {
-            setIsLoading(false);
+            console.error('Erro grafico:', e);
         }
     }, [usuario.id, periodo]);
 
+    const requestDelete = (item) => {
+        setSelectedItem(item);
+        setViewMode('delete');
+    };
+
+    const cancelDelete = () => {
+        setSelectedItem(null);
+        setViewMode('list');
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedItem) return;
+        setIsDeleting(true);
+        try {
+            await api.delete(`/consumo/${selectedItem.id}`);
+            await fetchHistory();
+            await fetchChart();
+            setViewMode('list');
+            setSelectedItem(null);
+        } catch (e) {
+            console.error("Erro delete:", e);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     useEffect(() => {
         if (visible) { 
+            loadSettings();
             fetchHistory();
             fetchChart();
+            setViewMode('list');
         }
-    }, [visible, fetchHistory, fetchChart]);
+    }, [visible, fetchHistory, fetchChart, loadSettings]);
 
     return (
-        <Modal transparent animation='slide' visible={visible}>
+        <Modal transparent animationType='fade' visible={visible}>
             <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalContainer}>
+                
                 <View style={styles.modal}>
-                    {!isLoading ? (
-                        <>
-                            <View style={styles.modalHeader}>
-                                <Text style={{
-                                    fontFamily: 'Poppins-M',
-                                    fontSize: 8 * scale,
-                                    color: '#6C83A1',
-                                    lineHeight: 8.8 * scale
-                                }}>
-                                    Visualizar Dados
-                                </Text>
+                    
+                    {/* HEADER */}
+                    <View style={styles.modalHeader}>
+                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1', lineHeight: 8.8 * scale }}>
+                            {viewMode === 'delete' ? 'Excluir Registro' : 'Visualizar Dados'}
+                        </Text>
+                        <Pressable style={styles.closeModalBtn} onPress={() => setVisible(false)}>
+                            <Ionicons name="close" size={ICON_SIZE * 0.8} color="#6C83A1" />
+                        </Pressable>
+                    </View>
 
-                                <Pressable style={styles.closeModalBtn} onPress={() => setVisible(false)}>
-                                    <Ionicons name="close" size={24} color="#6C83A1" />
-                                </Pressable>
+                    <View style={styles.modalBody}>
+                        {isLoading ? (
+                            <View style={styles.loadingContainer}>
+                                <ActivityIndicator size="large" color="#6C83A1" />
                             </View>
+                        ) : (
+                            <>
+                                {viewMode === 'list' && (
+                                    <>
+                                        {/* FILTROS */}
+                                        <View style={styles.periodFilters}>
+                                            {['Hoje', 'Semana', 'Mes', 'Ano'].map((p) => (
+                                                <Pressable 
+                                                    key={p}
+                                                    style={[styles.filter, { backgroundColor: periodo === p ? '#6C83A1' : '#f0f0f0' }]} 
+                                                    onPress={() => setPeriodo(p)}
+                                                >
+                                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: periodo === p ? '#fff' : '#6C83A1', lineHeight: 9 * scale }}>
+                                                        {p === 'Hoje' ? '24h' : p === 'Mes' ? '30d' : p === 'Ano' ? '365d' : '7d'}
+                                                    </Text>
+                                                </Pressable>
+                                            ))}
+                                        </View>
 
-                            <View style={styles.modalBody}>
-                                <View style={styles.periodFilters}>
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Hoje' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Hoje')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === 'Hoje' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            24h
-                                        </Text>
-                                    </Pressable>
+                                        {/* ABAS */}
+                                        <View style={styles.tabSwitch}>
+                                            <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140', lineHeight: 9 * scale }}>
+                                                    Histórico
+                                                </Text>
+                                            </Pressable>
+                                            <Pressable style={styles.tab} onPress={() => setAba('Gráficos')}>
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: aba === 'Gráficos' ? '#6C83A1' : '#6C83A140', lineHeight: 9 * scale }}>
+                                                    Gráficos
+                                                </Text>
+                                            </Pressable>
+                                            <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? S1 : (0.2 * width) + (S1 * 2) }]}></View>
+                                        </View>
 
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Semana' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Semana')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === 'Semana' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            7d
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Mes' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Mes')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === 'Mes' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            30d
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={[styles.filter, { backgroundColor: periodo === 'Ano' ? '#6C83A1' : '#f0f0f0' }]} onPress={() => setPeriodo('Ano')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: periodo === 'Ano' ? '#fff' : '#6C83A1',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            365d
-                                        </Text>
-                                    </Pressable>
-                                </View>
-
-                                <View style={styles.tabSwitch}>
-                                    <Pressable style={styles.tab} onPress={() => setAba('Histórico')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: aba === 'Histórico' ? '#6C83A1' : '#6C83A140',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            Histórico
-                                        </Text>
-                                    </Pressable>
-
-                                    <Pressable style={styles.tab} onPress={() => setAba('Gráficos')}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins-M',
-                                            fontSize: 6 * scale,
-                                            color: aba === 'Gráficos' ? '#6C83A1' : '#6C83A140',
-                                            lineHeight: 9 * scale
-                                        }}>
-                                            Gráficos
-                                        </Text>
-                                    </Pressable>
-
-                                    <View style={[styles.tabSwitchWrapper, { left: aba === 'Histórico' ? 0.0125 * width : 0.23 * width }]}></View>
-                                </View>
-
-                                <View style={styles.tabContent}>
-                                    {
-                                        aba === 'Histórico' ? (
-                                            history && history.length > 0 ? (
-                                                <SectionList
-                                                    sections={history}
-                                                    keyExtractor={(item, index) => item + index}
-                                                    renderItem={({item}) => (
-                                                        <View style={styles.historyItem}>
-                                                            <Image source={{uri: item.copo_icone_caminho ? BASE_URL_STORAGE + item.copo_icone_caminho : null}} 
-                                                                style={{ height: '100%', aspectRatio: 1 / 1,   objectFit: 'contain' }} 
-                                                            />
-                                                            
-                                                            <View style={styles.historyItemInfo}>
-                                                                <Text style={{
-                                                                    fontFamily: 'Poppins-M',
-                                                                    fontSize: 6 * scale,
-                                                                    color: '#6C83A1',
-                                                                    lineHeight: 9 * scale
-                                                                }}>
-                                                                    {item.volume_ml} ml - {item.copo_nome}
-                                                                </Text>
-                                                                
-                                                                <Text style={{ 
-                                                                    fontFamily: 'Poppins-M',
-                                                                    fontSize: 5 * scale,
-                                                                    color: '#6C83A1',
-                                                                    lineHeight: 8 * scale
-                                                                }}>{item.hora}</Text>
+                                        {/* CONTEÚDO */}
+                                        <View style={styles.tabContent}>
+                                            {aba === 'Histórico' ? (
+                                                history && history.length > 0 ? (
+                                                    <SectionList
+                                                        sections={history}
+                                                        keyExtractor={(item, index) => `${item.id}-${index}`}
+                                                        contentContainerStyle={styles.listContent}
+                                                        renderItem={({ item }) => (
+                                                            <View style={styles.historyItem}>
+                                                                <View style={styles.historyLeftInfo}>
+                                                                    <Image 
+                                                                        source={{ uri: item.copo_icone_caminho ? BASE_URL_STORAGE + item.copo_icone_caminho : null }} 
+                                                                        style={styles.itemImage} 
+                                                                    />
+                                                                    <View style={styles.historyItemText}>
+                                                                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#6C83A1' }}>
+                                                                            {item.volume_ml} ml
+                                                                        </Text>
+                                                                    </View>
+                                                                </View>
+                                                                <Pressable style={styles.deleteIconBtn} onPress={() => requestDelete(item)}>
+                                                                    <AntDesign name="delete" size={ICON_SIZE * 0.6} color="#6C83A1" />
+                                                                </Pressable>
                                                             </View>
-                                                        </View>
-                                                    )}
-                                                    ItemSeparatorComponent={() => (
-                                                        <View style={{
-                                                            width: '100%',
-                                                            height: 0.0444 * width,
-                                                        }}></View>
-                                                    )}
-                                                    renderSectionHeader={({ section }) => 
-                                                        {
-                                                            const sectionIndex = history.indexOf(section);
-                                                            const isFirst = sectionIndex === 0;
-                                                            const isLast = sectionIndex === history.length - 1;
-
-                                                            let headerStyles = {
-                                                                fontFamily: 'Poppins-M',
-                                                                fontSize: 7 * scale,
-                                                                color: '#6C83A1',
-                                                                lineHeight: 10 * scale,
-                                                                paddingBottom: 0,
-                                                                paddingTop: 0,
-                                                            };
-
-                                                            if (isFirst) {
-                                                                headerStyles.paddingBottom = PADDING_BOTTOM;
-                                                                headerStyles.paddingTop = 0;
-                                                            } else if (isLast) {
-                                                                headerStyles.paddingTop = PADDING_VERTICAL;
-                                                                headerStyles.paddingBottom = 0;
-                                                            } else {
-                                                                headerStyles.paddingTop = PADDING_VERTICAL;
-                                                                headerStyles.paddingBottom = PADDING_BOTTOM;
-                                                            }
-
-                                                            return (
-                                                                <Text style={headerStyles}>
-                                                                    {section.title} ({section.total_diario}ml)
+                                                        )}
+                                                        renderSectionHeader={({ section: { title, total_diario } }) => (
+                                                            <View style={styles.sectionHeader}>
+                                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 6 * scale, color: '#6C83A1', opacity: 0.7 }}>
+                                                                    {title} ({total_diario}ml)
                                                                 </Text>
-                                                            );
-                                                        }
-                                                    }
-                                                />
-                                            ) : (
-                                                <View style={{
-                                                    height: 0.1 * height,
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}>
-                                                    <Text style={{
-                                                        fontFamily: 'Poppins-M',
-                                                        fontSize: 8 * scale,
-                                                        color: '#6C83A1',
-                                                        lineHeight: 11 * scale,
-                                                    }}>
-                                                        Sem dados para mostrar
-                                                    </Text>
-                                                </View>
-                                            )
-                                        ) : (
-                                            lineData && lineData.length > 0 ? ( 
-                                                <View
-                                                    style={{
-                                                        width: '100%',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        overflow: 'hidden',
-                                                    }}
-                                                    >
-                                                    <LineChart
-                                                        data={lineData}
-                                                        areaChart
-                                                        startFillColor="#6C83A1"
-                                                        endFillColor="#fff"
-                                                        startOpacity={0.5}
-                                                        endOpacity={0}
-                                                        bezier
-                                                        smoothness={0.7}
-                                                        thickness={2}
-                                                        yAxisColor="#6C83A1"
-                                                        xAxisColor="#6C83A1"
-                                                        xAxisThickness={1}
-                                                        yAxisThickness={1}
-                                                        AxisExtraSpace={20}
-                                                        color="#6C83A1"
-                                                        height={0.25 * height}
-                                                        width={CHART_CONTAINER_WIDTH * 0.95}
-                                                        dataPointsColor="#6C83A1"
-                                                        dataPointsWidth={8}
-                                                        dataPointsHeight={8}
-                                                        xAxisLabelTextStyle={{
-                                                            fontFamily: 'Poppins-M',
-                                                            fontSize: 5 * scale,
-                                                            color: '#6C83A1',
-                                                        }}
-                                                        yAxisTextStyle={{
-                                                            fontFamily: 'Poppins-M',
-                                                            fontSize: 5 * scale,
-                                                            color: '#6C83A1',
-                                                        }}
-                                                        minValue={0}
-                                                        maxValue={4000}
-                                                        yAxisLabelWidth={0.1 * width}
-                                                        isSecondaryDataPoints
+                                                            </View>
+                                                        )}
                                                     />
-                                                </View>
+                                                ) : (
+                                                    <View style={styles.emptyState}>
+                                                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 4.7 * scale, color: '#6C83A1' }}>
+                                                            Sem dados para mostrar
+                                                        </Text>
+                                                    </View>
+                                                )
                                             ) : (
-                                                <View style={{
-                                                    height: 0.1 * height,
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}>
-                                                    <Text style={{
-                                                        fontFamily: 'Poppins-M',
-                                                        fontSize: 8 * scale,
-                                                        color: '#6C83A1',
-                                                        lineHeight: 11 * scale,
-                                                    }}>
-                                                        Sem dados para mostrar
-                                                    </Text>
-                                                </View>  
-                                            )
-                                        )
-                                    }
-                                </View>
-                            </View>
-                        </>
-                    ) : (
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <ActivityIndicator size="large" color="#6C83A1" /> 
-                        </View>
-                    )}
+                                                lineData && lineData.length > 0 ? (
+                                                    <View style={styles.chartContainer}>
+                                                        <LineChart
+                                                            data={lineData}
+                                                            areaChart
+                                                            startFillColor="#6C83A1"
+                                                            endFillColor="#fff"
+                                                            startOpacity={0.5}
+                                                            endOpacity={0}
+                                                            bezier
+                                                            smoothness={0.7}
+                                                            thickness={2}
+                                                            yAxisColor="#6C83A1"
+                                                            xAxisColor="#6C83A1"
+                                                            xAxisThickness={1}
+                                                            yAxisThickness={1}
+                                                            color="#6C83A1"
+                                                            height={CHART_HEIGHT}
+                                                            width={CHART_WIDTH}
+                                                            dataPointsColor="#6C83A1"
+                                                            dataPointsWidth={8}
+                                                            dataPointsHeight={8}
+                                                            maxValue={metaMl}
+                                                            noOfSections={4}
+                                                            yAxisLabelWidth={LABEL_WIDTH} 
+                                                            xAxisLabelTextStyle={{ fontFamily: 'Poppins-M', fontSize: 5 * scale, color: '#6C83A1' }}
+                                                            yAxisTextStyle={{ fontFamily: 'Poppins-M', fontSize: 5 * scale, color: '#6C83A1' }}
+                                                            isSecondaryDataPoints
+                                                        />
+                                                    </View>
+                                                ) : (
+                                                    <View style={styles.emptyState}>
+                                                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 4.7 * scale, color: '#6C83A1' }}>
+                                                            Sem dados para mostrar
+                                                        </Text>
+                                                    </View>
+                                                )
+                                            )}
+                                        </View>
+                                    </>
+                                )}
+
+                                {viewMode === 'delete' && selectedItem && (
+                                    <View style={styles.deleteContainer}>
+                                        <AntDesign name="warning" size={ICON_SIZE * 1.5} color="#e11d48" />
+                                        
+                                        <Text style={{ fontFamily: 'Poppins-M', fontSize: 8 * scale, color: '#6C83A1', textAlign: 'center' }}>
+                                            Tem certeza que deseja excluir este registro?
+                                        </Text>
+                                        
+                                        <Text style={{ fontFamily: 'Poppins-SB', fontSize: 7 * scale, color: '#6C83A1', textAlign: 'center' }}>
+                                            {selectedItem.volume_ml}ml
+                                        </Text>
+                                        
+                                        <View style={styles.actionButtonsRow}>
+                                            <Pressable 
+                                                style={[styles.actionBtn, { backgroundColor: '#ccc' }]} 
+                                                onPress={cancelDelete} 
+                                                disabled={isDeleting}
+                                            >
+                                                <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Cancelar</Text>
+                                            </Pressable>
+                                            
+                                            <Pressable 
+                                                style={[styles.actionBtn, { backgroundColor: '#e11d48' }]} 
+                                                onPress={confirmDelete} 
+                                                disabled={isDeleting}
+                                            >
+                                                {isDeleting ? (
+                                                    <ActivityIndicator color="#fff" />
+                                                ) : (
+                                                    <Text style={{ fontFamily: 'Poppins-M', fontSize: 7 * scale, color: '#fff' }}>Confirmar</Text>
+                                                )}
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                )}
+                            </>
+                        )}
+                    </View>
                 </View>
             </BlurView>
         </Modal>
     );
 };
 
-const dynamicStyles = (width, height) => StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+const dynamicStyles = (width, height, scale) => {
+    return StyleSheet.create({
+        modalContainer: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
 
-    modal: {
-        width: '82%',
-        backgroundColor: '#fff',
-        borderRadius: 0.025 * width,
-        padding: 0.0444 * width,
-        gap: 0.0222 * width,
-    },
+        modal: {
+            width: 0.82 * width,
+            backgroundColor: '#fff',
+            borderRadius: 0.025 * width,
+            padding: 0.0444 * width,
+            gap: 0.0222 * width,
+        },
 
-    modalHeader: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+        modalHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+        },
 
-    modalBody: {
-        gap: 0.0222 * width,
-    },
+        // REMOVIDO minHeight DAQUI PARA TIRAR ESPAÇO EXTRA NO DELETE
+        modalBody: {
+            gap: 0.0222 * width,
+        },
 
-    closeModalBtn: {
-        height: 0.04 * height,
-        aspectRatio: 1 / 1,
-        borderRadius: 0.0125 * width,
-        backgroundColor: '#f0f0f0',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+        // ALTURA MÍNIMA APENAS NO LOADING PARA NÃO FICAR ACHATADO
+        loadingContainer: {
+            height: 0.2 * height, 
+            justifyContent: 'center', 
+            alignItems: 'center'
+        },
 
-    periodFilters: {
-        width: '100%',
-        flexDirection: 'row',
-        gap: 0.0222 * width,
-    },
+        closeModalBtn: {
+            width: 0.04 * height,
+            aspectRatio: 1 / 1,
+            borderRadius: 0.0111 * width,
+            backgroundColor: '#f0f0f0',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
 
-    filter: {
-        padding: 0.0222 * width,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 0.0125 * width,
-    },
+        periodFilters: {
+            flexDirection: 'row',
+            gap: 0.0222 * width,
+        },
 
-    tabSwitch: {
-        width: 'auto',
-        height: 0.05 * height,
-        backgroundColor: '#fafafa',
-        flexDirection: 'row',
-        borderRadius: 0.0125 * width,
-        padding: 0.015 * width,
-        gap: 0.015 * width,
-        position: 'relative',
-    },
+        filter: {
+            padding: 0.0222 * width,
+            borderRadius: 0.0111 * width,
+        },
 
-    tab: {
-        height: '100%',
-        width: 0.2 * width,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 2,
-    },
+        tabSwitch: {
+            height: 0.05 * height,
+            backgroundColor: '#fafafa',
+            flexDirection: 'row',
+            borderRadius: 0.0111 * width,
+            padding: 0.0111 * width,
+            gap: 0.0111 * width,
+            position: 'relative',
+        },
 
-    tabSwitchWrapper: {
-        position: 'absolute',
-        top: 0.015 * width,
-        left: 0.015 * width,
-        width: 0.2 * width,
-        height: '100%',
-        backgroundColor: '#fff',
-        zIndex: 1,
-        borderRadius: 0.0125 * width,
-    },
+        tab: {
+            height: '100%',
+            width: 0.2 * width,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2,
+        },
 
-    tabContent: {
-        maxHeight: 0.3 * height,
-        width: '100%',
-    },
+        tabSwitchWrapper: {
+            position: 'absolute',
+            top: 0.0111 * width,
+            width: 0.2 * width,
+            height: '100%',
+            backgroundColor: '#fff',
+            zIndex: 1,
+            borderRadius: 0.0111 * width,
+        },
 
-    historyItem: {
-        width: '100%',
-        height: 0.025 * height,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 0.0222 * width,
-    },
+        tabContent: {
+            maxHeight: 0.4 * height,
+        },
 
-    historyItemInfo: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    }
-});
+        listContent: {
+            gap: 0.0222 * width,
+        },
+
+        sectionHeader: {
+            backgroundColor: '#fff',
+            padding: 0.0111 * width,
+        },
+
+        historyItem: {
+            width: '100%',
+            height: 0.055 * height,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: '#f9f9f9',
+            padding: 0.0222 * width,
+            borderRadius: 0.0222 * width,
+            gap: 0.0222 * width,
+        },
+
+        historyLeftInfo: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 0.0222 * width,
+            height: '100%',
+        },
+
+        itemImage: {
+            height: '100%',
+            aspectRatio: 1 / 1,
+            objectFit: 'contain'
+        },
+
+        historyItemText: {
+            justifyContent: 'center',
+        },
+
+        deleteIconBtn: {
+            padding: 0.0111 * width,
+        },
+
+        chartContainer: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            padding: 0.0222 * width,
+        },
+
+        emptyState: {
+            height: 0.2 * height,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        
+        // CONTAINER EXCLUSÃO COMPACTO
+        deleteContainer: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: 0.0222 * width, // Padding Top reduzido
+            gap: 0.0222 * width,
+        },
+
+        actionButtonsRow: {
+            flexDirection: 'row',
+            gap: 0.0222 * width,
+            width: '100%',
+        },
+
+        actionBtn: {
+            flex: 1,
+            height: 0.06 * height,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 9999,
+        }
+    });
+};
 
 export default AguaModalHistorico;

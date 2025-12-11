@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { MaterialCommunityIcons, FontAwesome5, Ionicons, FontAwesome6, Entypo } from '@expo/vector-icons';
 
 import { BASE_URL_STORAGE } from '../../constants/api';
+
 import { dynamicStyles } from './styles';
 
 const Home = () => {
@@ -20,7 +21,7 @@ const Home = () => {
     const data = new Date();
 
     const imagemPerfilUrl = usuario?.fotoPerfil 
-        ? `${BASE_URL_STORAGE}/${usuario.fotoPerfil}` 
+        ? `${BASE_URL_STORAGE}storage/${usuario.fotoPerfil}` 
         : null;
 
     const APPS = [
@@ -31,7 +32,7 @@ const Home = () => {
         { nome: 'Cálculo de IMC', icon: 'weight', lib: FontAwesome5, route: 'Imc' },
         { nome: 'Minhas Alergias', icon: 'hand-holding-medical', lib: FontAwesome5, route: 'Alergias' },
         { nome: 'Glicemia', icon: 'water-percent', lib: MaterialCommunityIcons, route: 'Glicemia' },
-        { nome: 'Meditação', icon: 'spa', lib: MaterialCommunityIcons, route: 'Meditacao' },
+        { nome: 'UBS Próximas', icon: 'hospital-marker', lib: MaterialCommunityIcons, route: 'UbsProximas' }, // Adicionado
         { nome: 'Motivação Diária', icon: 'star', lib: Entypo, route: 'Motivacao' },
         { nome: 'Guia de Frutas', icon: 'fruit-watermelon', lib: MaterialCommunityIcons, route: 'Frutas' },
         { nome: 'Emergência', icon: 'ambulance', lib: FontAwesome5, route: 'Emergencia' },

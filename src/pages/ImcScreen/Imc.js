@@ -64,7 +64,6 @@ const Imc = () => {
     const [velocimetroSize, setVelocimetroSize] = useState({ width: 0, height: 0 });
     const [ultimoRegistro, setUltimoRegistro] = useState(null);
 
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const fetchLatestRegistry = useCallback(async () => {
@@ -283,7 +282,6 @@ const Imc = () => {
 
             <ImcModalHistorico visible={historicoModalVisible} setVisible={setHistoricoModalVisible} height={height} width={width} scale={scale}></ImcModalHistorico>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

@@ -26,13 +26,12 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#fff'
     },
 
-    // --- Menu Opções (Dropdown do Header) ---
     menuOptions: {
         position: 'absolute',
         width: 0.35 * width,
         padding: 0.0222 * width,
         borderRadius: 0.0175 * width,
-        top: 0.06 * height, // Ajustado para ficar logo abaixo do botão
+        top: 0.06 * height,
         right: 0.0889 * width,
         backgroundColor: '#fefefe',
         zIndex: 100,
@@ -117,7 +116,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'center',
     },
 
-    // --- Modal Styles (Genérico para Copo) ---
     modalContainer: {
         flex: 1,
         backgroundColor: '#00000080',
@@ -140,10 +138,8 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * width,
     },
 
-    // Styles específicos para o HelpModal (Configuração/Ajuda)
     helpModal: {
         width: '82%',
-        // Removed alignItems: 'center' to allow children (inputs) to fill width
         maxHeight: '60%',
         backgroundColor: '#fefefe',
         borderRadius: 0.025 * height,
@@ -178,7 +174,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderWidth: 0.002 * height,
         borderRadius: 0.01 * height,
         color: '#6C83A1',
-        textAlign: 'left', // Alinhamento à esquerda
+        textAlign: 'left',
     },
 
     select: {
@@ -194,7 +190,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         justifyContent: 'space-between',
     },
 
-    // Dropdown padrão (para baixo)
     optionsContainer: {
         position: 'absolute',
         top: '115%',
@@ -210,7 +205,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         overflow: 'hidden',
     },
 
-    // Dropdown invertido (para cima)
     optionsContainerUp: {
         position: 'absolute',
         bottom: '110%',

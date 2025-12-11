@@ -14,12 +14,12 @@ import {
     useWindowDimensions,
     ActivityIndicator,
     ScrollView,
-    Modal // Adicionado
+    Modal
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
-import { BlurView } from 'expo-blur'; // Adicionado
+import { BlurView } from 'expo-blur';
 import axios from 'axios';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -128,7 +128,6 @@ const Frutas = () => {
     const [fruitOfDay, setFruitOfDay] = useState(null);
     const [selectedFruit, setSelectedFruit] = useState(null);
 
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const bottomSheetRef = useRef(null);
@@ -633,7 +632,6 @@ const Frutas = () => {
                 </BottomSheetView>
             </BottomSheetModal>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

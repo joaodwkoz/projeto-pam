@@ -84,7 +84,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.0125 * width
     },
 
-    // --- Configuração Inline Styles ---
     configSection: {
         width: '100%',
         gap: 0.0222 * width,
@@ -96,8 +95,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         height: 0.05 * height,
         paddingHorizontal: 0.0222 * width,
         backgroundColor: '#fff',
-        borderColor: '#eee',
-        borderWidth: 0.002 * height,
         borderRadius: 0.0125 * width,
         flexDirection: 'row',
         alignItems: 'center',
@@ -129,7 +126,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.0222 * width,
     },
 
-    // --- Estilos do Modal de Ajuda ---
     modalBackdrop: {
         flex: 1,
         width: '100%',

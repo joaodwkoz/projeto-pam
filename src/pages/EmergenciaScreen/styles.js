@@ -164,7 +164,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         flexDirection: 'row',
     },
 
-    // BottomSheet specific styles
     bottomSheetInput: {
         width: '100%',
         height: 0.05 * height,
@@ -179,7 +178,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         color: '#6C83A1',
     },
 
-    // --- Estilos do Modal de Ajuda ---
     modalBackdrop: {
         flex: 1,
         width: '100%',

@@ -7,7 +7,6 @@ import Agua from '../pages/AguaScreen/Agua';
 import Imc from '../pages/ImcScreen/Imc';
 import Alergias from '../pages/AlergiasScreen/Alergias';
 import Glicemia from '../pages/GlicemiaScreen/Glicemia';
-import Meditacao from '../pages/MeditacaoScreen/Meditacao';
 import Batimentos from '../pages/BatimentosScreen/Batimentos';
 import Motivacao from '../pages/MotivacaoScreen/Motivacao';
 import Frutas from '../pages/FrutasScreen/Frutas';
@@ -15,6 +14,7 @@ import Emergencia from '../pages/EmergenciaScreen/Emergencia';
 import Pressao from '../pages/PressaoScreen/Pressao';
 import Vacinas from '../pages/VacinasScreen/Vacinas';
 import Remedios from '../pages/RemediosScreen/Remedios';
+import UbsProximas from '../pages/UbsProximasScreen/UbsProximas';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +30,6 @@ export default function AppRoutes() {
             <Stack.Screen name="Imc" component={Imc} />
             <Stack.Screen name="Alergias" component={Alergias} />
             <Stack.Screen name="Glicemia" component={Glicemia} />
-            <Stack.Screen name="Meditacao" component={Meditacao} />
             <Stack.Screen name="Batimentos" component={Batimentos} />
             <Stack.Screen name="Motivacao" component={Motivacao} />
             <Stack.Screen name="Frutas" component={Frutas} />
@@ -38,6 +37,7 @@ export default function AppRoutes() {
             <Stack.Screen name="Pressao" component={Pressao} />
             <Stack.Screen name="Vacinas" component={Vacinas} />
             <Stack.Screen name="Remedios" component={Remedios} />
+            <Stack.Screen name="UbsProximas" component={UbsProximas} />
         </Stack.Navigator>
     )
 }

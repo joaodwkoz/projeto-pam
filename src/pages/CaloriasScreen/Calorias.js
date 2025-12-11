@@ -43,13 +43,11 @@ const Calorias = () => {
     const [portionCount, setPortionCount] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Estados de Configuração e Menu
     const [metaCalorias, setMetaCalorias] = useState(2500);
     const [mostrarMenuOpcoes, setMostrarMenuOpcoes] = useState(false);
     const [modalConfigVisible, setModalConfigVisible] = useState(false);
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
-    // Carregar configurações iniciais
     useEffect(() => {
         const loadSettings = async () => {
             try {
@@ -207,7 +205,6 @@ const Calorias = () => {
                 </Pressable>
             </View>
 
-            {/* Menu Dropdown */}
             {mostrarMenuOpcoes && (
                 <View style={styles.menuOptions}>
                     <Pressable style={styles.menuOption} onPress={() => {
@@ -263,7 +260,6 @@ const Calorias = () => {
             </View>
 
             <ScrollView style={{ height: '100%' }} contentContainerStyle={{ gap: 0.0444 * width }} showsVerticalScrollIndicator={false}>
-                {/* Café da Manhã */}
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
@@ -294,7 +290,6 @@ const Calorias = () => {
                     </Pressable>
                 </View>
 
-                {/* Almoço */}
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
@@ -325,7 +320,6 @@ const Calorias = () => {
                     </Pressable>
                 </View>
 
-                {/* Jantar */}
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
@@ -356,7 +350,6 @@ const Calorias = () => {
                     </Pressable>
                 </View>
 
-                {/* Lanches */}
                 <View style={styles.meal}>
                     <View style={styles.mealHeader}>
                         <View style={styles.mealIdentity}>
@@ -388,7 +381,6 @@ const Calorias = () => {
                 </View>
             </ScrollView>
 
-            {/* Modal de Adicionar Refeição */}
             <Modal visible={modalVisible} animationType='slide' transparent>
                 <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                     <View style={styles.modalContainer}>
@@ -453,7 +445,6 @@ const Calorias = () => {
                 </KeyboardAvoidingView>
             </Modal>
 
-             {/* Modal de Configurações */}
             <Modal visible={modalConfigVisible} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setModalConfigVisible(false)}>
@@ -481,7 +472,6 @@ const Calorias = () => {
                 </BlurView>
             </Modal>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

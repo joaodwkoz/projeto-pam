@@ -339,8 +339,7 @@ const Alergias = () => {
                     </Pressable>
                 </BlurView>
             </Modal>
-
-            {/* Modal de Ajuda */}
+            
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.allergyModalContainer}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

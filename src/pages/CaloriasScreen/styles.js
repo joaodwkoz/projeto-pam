@@ -26,7 +26,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#fff'
     },
 
-    // --- Menu Opções ---
     menuOptions: {
         position: 'absolute',
         width: 0.35 * width,
@@ -121,7 +120,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 0.0025 * width,
     },
 
-    // --- Modal Styles ---
     modalContainer: {
         flex: 1,
         alignItems: 'center',
@@ -133,11 +131,10 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         width: '82%',
         borderRadius: 0.025 * height,
         padding: 0.0444 * width,
-        backgroundColor: '#fefefe', // Mudado para branco
+        backgroundColor: '#fefefe',
         gap: 0.0444 * width,
     },
     
-    // Configuração e Ajuda (Modal)
     modalBackdrop: {
         flex: 1,
         width: '100%',
@@ -160,7 +157,6 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         gap: 0.01 * height,
     },
     
-    // Inputs e Campos do Modal de Adicionar Comida (Adaptado para o tema claro)
     searchFood: {
         gap: 0.0444 * width,
     },
@@ -180,7 +176,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     options: {
         width: '100%',
         height: 0.235 * height,
-        backgroundColor: '#fff', // Fundo claro
+        backgroundColor: '#fff',
         borderRadius: 0.015 * width,
         borderColor: '#eee',
         borderWidth: 0.002 * height,
@@ -202,7 +198,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
     optionsSeparator: {
         width: '100%',
         height: 0.002 * height,
-        backgroundColor: '#eee', // Separador claro
+        backgroundColor: '#eee',
         borderRadius: 0.001 * height,
     },
 
@@ -222,7 +218,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         borderRadius: 9999,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#6C83A1', // Azul padrão
+        backgroundColor: '#6C83A1',
     },
 
     portionInput: {

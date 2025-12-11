@@ -46,7 +46,6 @@ const Motivacao = () => {
     const [mostrarOpcoesFrequencia, setMostrarOpcoesFrequencia] = useState(false);
     const [notificationId, setNotificationId] = useState(null);
     
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
     const FREQUENCIAS = [
@@ -329,7 +328,6 @@ const Motivacao = () => {
                     </View>
                 </View>
 
-                {/* Seção de Configuração Inline */}
                 <View style={styles.configSection}>
                     <Text style={{
                         fontFamily: 'Poppins-M',
@@ -378,7 +376,6 @@ const Motivacao = () => {
                 </View>
             </ScrollView>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>

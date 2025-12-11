@@ -152,8 +152,7 @@ export const dynamicStyles = (width, height) => StyleSheet.create({
         backgroundColor: '#6C83A1',
         borderRadius: 0.1 * width,
     },
-
-    // --- Estilos do Modal de Ajuda ---
+    
     modalBackdrop: {
         flex: 1,
         width: '100%',

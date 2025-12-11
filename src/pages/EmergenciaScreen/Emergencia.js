@@ -23,7 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
-import * as Location from 'expo-location'; // Importação do Location
+import * as Location from 'expo-location';
 
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -56,28 +56,23 @@ const Emergencia = () => {
         'Poppins-SB': require('../../../assets/fonts/Poppins-SemiBold.ttf'),
     });
 
-    // Estados de Contatos
     const [contacts, setContacts] = useState([]);
     const [isContactsLoading, setIsContactsLoading] = useState(true);
     const [isSavingContact, setIsSavingContact] = useState(false);
     const [isDeletingContact, setIsDeletingContact] = useState(false);
 
-    // Estados de Ações (Ligações/Mensagens)
     const [callingServiceCode, setCallingServiceCode] = useState(null);
     const [contactActionLoadingId, setContactActionLoadingId] = useState(null);
     const [contactActionType, setContactActionType] = useState(null);
 
-    // Estados de Localização (Novo)
     const [isLocationLoading, setIsLocationLoading] = useState(true);
     const [addressLine1, setAddressLine1] = useState('Carregando endereço...');
     const [addressLine2, setAddressLine2] = useState('Aguarde um momento');
     const [locationAccuracy, setLocationAccuracy] = useState('-');
     const [userLocation, setUserLocation] = useState(null);
 
-    // Estado do Modal de Ajuda
     const [mostrarModalAjuda, setMostrarModalAjuda] = useState(false);
 
-    // BottomSheet & Modal States
     const bottomSheetRef = useRef(null);
     const [sheetIndex, setSheetIndex] = useState(-1);
     const snapPoints = useMemo(() => ['42%'], []);
@@ -89,7 +84,6 @@ const Emergencia = () => {
         note: '',
     });
 
-    // Carregar Contatos e Localização ao iniciar
     useEffect(() => {
         loadContacts();
         handleRefreshLocation();
@@ -112,7 +106,6 @@ const Emergencia = () => {
         }
     };
 
-    // --- Lógica de Localização ---
     const handleRefreshLocation = async () => {
         setIsLocationLoading(true);
         try {
@@ -143,7 +136,7 @@ const Emergencia = () => {
                 const number = addr.streetNumber || 'S/N';
                 const district = addr.district || addr.subregion || '';
                 const city = addr.city || '';
-                const region = addr.region || ''; // Estado (UF)
+                const region = addr.region || '';
 
                 setAddressLine1(`${street}, ${number}`);
                 setAddressLine2(`${district} - ${city}, ${region}`.replace(/^ - /, ''));
@@ -160,7 +153,6 @@ const Emergencia = () => {
             setIsLocationLoading(false);
         }
     };
-    // ----------------------------
 
     const persistContacts = async (nextContacts) => {
         setContacts(nextContacts);
@@ -319,7 +311,7 @@ const Emergencia = () => {
             setContactActionType('whatsapp');
 
             const cleanPhone = contact.phone.replace(/\D/g, '');
-            // Envia mensagem com a localização se disponível
+
             let message = "Olá, estou precisando de ajuda.";
             if (userLocation) {
                 const mapsLink = `https://www.google.com/maps/search/?api=1&query=${userLocation.coords.latitude},${userLocation.coords.longitude}`;
@@ -651,7 +643,6 @@ const Emergencia = () => {
                 </BottomSheetView>
             </BottomSheetModal>
 
-            {/* Modal de Ajuda */}
             <Modal visible={mostrarModalAjuda} transparent animationType='slide'>
                 <BlurView intensity={8} tint="dark" experimentalBlurMethod='dimezisBlurView' style={styles.modalBackdrop}>
                     <Pressable style={styles.modalBackdrop} onPress={() => setMostrarModalAjuda(false)}>
